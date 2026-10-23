@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Docente · Práctica de Electrónica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+.envoltura{max-width:1200px}
+.tabs{display:flex;gap:8px;margin:10px 0}
+.tabs button{font:inherit;font-weight:800;padding:10px 18px;border-radius:12px;border:2px solid var(--borde);background:var(--panel2);color:var(--tinta);cursor:pointer}
+.tabs button.on{border-color:var(--amb);background:rgba(255,176,32,.2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.al{background:var(--panel);border:2px solid var(--borde);border-radius:16px;padding:12px 14px;position:relative}
+.al .n{font-weight:900;font-size:17px;line-height:1.2}
+.al .s{font-size:13px;color:var(--suave)}
+.al .barra{height:8px;border-radius:8px;background:#0a1624;margin:8px 0 6px;overflow:hidden}
+.al .barra div{height:100%;background:var(--az)}
+.al .est{position:absolute;top:10px;right:10px}
+.al.trabajando{border-color:var(--az)}
+.al.afuera{border-color:var(--ro);background:rgba(248,113,113,.14);animation:lat 1s ease-in-out infinite}
+.al.entrego{border-color:var(--ve)}
+.al.practicando2{border-color:var(--vi)}
+.al.sinsenal{opacity:.55}
+.al .notag{font-size:34px;font-weight:900;color:var(--ve)}
+.al .sal{font-weight:900;color:var(--ro)}
+@keyframes lat{50%{box-shadow:0 0 0 6px rgba(248,113,113,.35)}}
+.lista-al{max-height:420px;overflow:auto}
+.lista-al .it{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--borde);font-size:15px}
+.lista-al .it .h{color:var(--suave);font-variant-numeric:tabular-nums;min-width:62px}
+.lista-al .it.grave b{color:var(--ro)}
+#toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;background:var(--ro);color:#2a0606;font-weight:900;padding:14px 20px;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.5);font-size:19px;max-width:92vw;text-align:center}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+@media (max-width:900px){.cols{grid-template-columns:1fr}}
+.codigo{font-size:24px;font-weight:900;letter-spacing:.12em;color:var(--amb)}
+</style>
+</head>
+<body>
+<header class="barra"><div class="barra-in" style="max-width:1200px"><img src="logo.jpg" alt="IAT"><div class="t">Página del docente<small>Práctica de Electrónica · tablero en vivo</small></div><div class="der"><span class="chip" id="conex">sin conectar</span></div></div></header>
+<main class="envoltura">
+  <div class="tarjeta" id="config">
+    <b>Conexión con la planilla</b>
+    <label class="campo" for="url">Dirección de la aplicación web (termina en /exec)</label><input class="txt" id="url" placeholder="https://script.google.com/macros/s/…/exec">
+    <label class="campo" for="clave">Clave del profe</label><input class="txt" id="clave" type="password" autocomplete="off">
+    <div class="fila" style="margin-top:12px"><button class="btn" id="conectar">Conectar</button><button class="btn sec" id="demo">Ver cómo se ve (prueba)</button></div>
+    <p class="sub" style="font-size:14px;margin-top:10px">La dirección y la clave quedan guardadas en esta compu. Los pasos para armar la planilla están en el archivo LEEME.</p>
+  </div>
+  <div id="tablero" class="oculto">
+    <div class="fila" style="justify-content:space-between">
+      <div class="tabs"><button data-c="e1">Electrónica 1</button><button data-c="e2">Electrónica 2</button></div>
+      <div class="fila"><button class="btn sec" id="sonido">🔔 Activar sonido</button><a class="btn sec" id="planilla" target="_blank" rel="noopener" style="text-decoration:none">📊 Planilla</a><button class="btn sec" id="limpiar">🧹 Limpiar tablero</button><button class="btn sec" id="ajustes">⚙️</button></div>
+    </div>
+    <div class="marcador" id="resumen"></div>
+    <div class="cols">
+      <div><h2>Alumnos</h2><div class="grid" id="grid"></div><p class="sub" id="vacio"></p></div>
+      <div><div class="tarjeta"><b>Código del trabajo para dictar</b><div id="codigos"></div></div>
+        <div class="tarjeta"><b>Avisos</b><div class="lista-al" id="alertas"><p class="sub">Todavía no hay avisos.</p></div></div></div>
+    </div>
+  </div>
+</main>
+<script src="config.js"></script>
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const g=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}, s=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const esc=x=>String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let URL_=g('profe_url',(window.CONFIG&&CONFIG.URL)||''), CLAVE=g('profe_clave',''), curso=g('profe_curso','e1'), demo=false, sonido=false, vistos=new Set(), primera=true, timer=null, ac=null;
+$('#url').value=URL_; $('#clave').value=CLAVE;
+const BANCOS={};
+function cargarBanco(c){return new Promise(r=>{const sc=document.createElement('script');sc.src='banco-'+c+'.js';sc.onload=()=>{BANCOS[c]=window.BANCO;r()};sc.onerror=r;document.body.appendChild(sc)})}
+cargarBanco('e1').then(()=>cargarBanco('e2')).then(pintarCodigos);
+function pintarCodigos(){const b=BANCOS[curso];$('#codigos').innerHTML=b?b.actividades.map(a=>`<div style="margin-top:8px"><div>${esc(a.nombre)}</div><div class="codigo">${esc(a.codigo)}</div><div class="sub" style="font-size:13px">${a.opc+a.num} preguntas · ${a.minutos} minutos</div></div>`).join(''):''}
+function pitido(){if(!sonido)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();[0,.18].forEach((d,i)=>{const o=ac.createOscillator(),v=ac.createGain();o.frequency.value=i?660:880;v.gain.setValueAtTime(.0001,ac.currentTime+d);v.gain.exponentialRampToValueAtTime(.35,ac.currentTime+d+.02);v.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d+.16);o.connect(v).connect(ac.destination);o.start(ac.currentTime+d);o.stop(ac.currentTime+d+.18)})}catch(e){}}
+function toast(t){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';document.body.appendChild(el)}el.textContent=t;clearTimeout(el._t);el._t=setTimeout(()=>el.remove(),6000);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
+  let n=0;clearInterval(toast.ti);const t0=document.title;toast.ti=setInterval(()=>{document.title=(n++%2)?'🚨 '+t:'Profe · Práctica';if(n>8){clearInterval(toast.ti);document.title='Profe · Práctica de Electrónica'}},700)}
+function hace(ms){const s=Math.round(ms/1000);return s<60?`hace ${s} s`:`hace ${Math.round(s/60)} min`}
+function hora(t){const d=new Date(t);return d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function pintar(d){
+  const ahora=d.ahora||Date.now(), al=d.alumnos||[];
+  if(d.planilla){$('#planilla').href=d.planilla;$('#planilla').classList.remove('oculto')}else $('#planilla').classList.add('oculto');
+  let nT=0,nA=0,nE=0,nS=0;
+  $('#grid').innerHTML=al.map(a=>{
+    let e=a.estado||'trabajando'; const sin=(e==='trabajando'||e==='afuera')&&ahora-(a.ultima||0)>60000;
+    if(e==='trabajando')nT++; if(e==='afuera')nA++; if(e==='entregó')nE++; if(e==='practicando')nS++;
+    const cls=e==='entregó'?'entrego':e==='practicando'?'practicando2':e, pct=a.total?Math.round(100*(a.respondidas||0)/a.total):0;
+    const chip=e==='afuera'?'<span class="chip ro">AFUERA</span>':e==='entregó'?'<span class="chip ve">entregó</span>':e==='practicando'?'<span class="chip">📘 practica</span>':sin?'<span class="chip">sin señal</span>':'<span class="chip">✍️ trabaja</span>';
+    return `<div class="al ${cls} ${sin?'sinsenal':''}"><div class="est">${chip}</div><div class="n">${a.lista?esc(a.lista)+'. ':''}${esc(a.alumno)}</div>
+      <div class="s">${esc(a.actividad||'')}</div>
+      ${e==='entregó'?`<div class="notag">${esc(a.nota)}</div>`:a.total?`<div class="barra"><div style="width:${pct}%"></div></div><div class="s">pregunta ${a.pregunta||1} de ${a.total} · respondió ${a.respondidas||0}</div>`:''}
+      ${e==='practicando'?`<div class="s">${a.series||0} prácticas · ${a.bien||0} consignas bien</div>`:''}
+      <div class="s">${a.salidas?`<span class="sal">🚨 salió ${a.salidas} ${a.salidas==1?'vez':'veces'}</span>${a.fuera_s?` · ${a.fuera_s} s afuera`:''} · `:''}${hace(ahora-(a.ultima||ahora))}</div></div>`}).join('');
+  $('#vacio').textContent=al.length?'':'Todavía no entró nadie. Cuando los chicos abran la página aparecen acá.';
+  $('#resumen').innerHTML=`<span class="chip">✍️ trabajando: ${nT}</span><span class="chip ${nA?'ro':''}">🚨 afuera: ${nA}</span><span class="chip ve">✔ entregaron: ${nE}</span><span class="chip">📘 practicando: ${nS}</span>`;
+  const als=(d.alertas||[]).slice().reverse();
+  $('#alertas').innerHTML=als.length?als.map(x=>`<div class="it ${x.grave?'grave':''}"><span class="h">${hora(x.t)}</span><span><b>${esc(x.lista?x.lista+'. ':'')}${esc(x.alumno)}</b>: ${esc(x.texto)}${x.detalle?`<br><span class="sub" style="font-size:13px">${esc(x.detalle)}</span>`:''}</span></div>`).join(''):'<p class="sub">Todavía no hay avisos.</p>';
+  const nuevos=(d.alertas||[]).filter(x=>!vistos.has(x.t+x.alumno+x.tipo));
+  (d.alertas||[]).forEach(x=>vistos.add(x.t+x.alumno+x.tipo));
+  if(!primera){const gr=nuevos.filter(x=>x.grave);if(gr.length){const x=gr[gr.length-1];toast(`🚨 ${x.lista?x.lista+'. ':''}${x.alumno}: ${x.texto}`);pitido()}}
+  primera=false;
+}
+async function pedir(){
+  if(demo){pintar(simular());return}
+  try{const r=await fetch(`${URL_}?accion=estado&curso=${curso}&clave=${encodeURIComponent(CLAVE)}&_=${Date.now()}`);const d=await r.json();
+    if(d.error==='clave'){$('#conex').textContent='clave incorrecta';$('#conex').className='chip ro';return}
+    $('#conex').textContent='en vivo';$('#conex').className='chip ve';pintar(d)}
+  catch(e){$('#conex').textContent='sin conexión';$('#conex').className='chip ro'}
+}
+function arrancar(){$('#config').classList.add('oculto');$('#tablero').classList.remove('oculto');marcar();clearInterval(timer);primera=true;vistos=new Set();pedir();timer=setInterval(pedir,4000)}
+function marcar(){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.c===curso));pintarCodigos()}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{curso=b.dataset.c;s('profe_curso',curso);marcar();primera=true;pedir()});
+$('#conectar').onclick=()=>{URL_=$('#url').value.trim();CLAVE=$('#clave').value;if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(URL_)){alertaCampo('La dirección tiene que empezar con https://script.google.com/macros/s/ y terminar en /exec');return}s('profe_url',URL_);s('profe_clave',CLAVE);demo=false;arrancar()};
+$('#demo').onclick=()=>{demo=true;$('#conex').textContent='modo prueba';$('#conex').className='chip amb';arrancar()};
+$('#ajustes').onclick=()=>{clearInterval(timer);$('#config').classList.remove('oculto');$('#tablero').classList.add('oculto')};
+$('#sonido').onclick=()=>{sonido=!sonido;$('#sonido').textContent=sonido?'🔔 Sonido activado':'🔔 Activar sonido';if(sonido)pitido()};
+$('#limpiar').onclick=()=>{const m=document.createElement('div');m.id='modal';m.innerHTML='<div class="caja"><h2 style="margin-top:0">¿Limpiar el tablero?</h2><p>Se borra lo que se ve acá (alumnos y avisos de hoy). La planilla no se toca.</p><div class="fila"><button class="btn sec" id="no">Cancelar</button><button class="btn ro" id="si">Limpiar</button></div></div>';document.body.appendChild(m);
+  $('#no').onclick=()=>m.remove();$('#si').onclick=async()=>{m.remove();if(demo){sim=null;pedir();return}try{await fetch(`${URL_}?accion=limpiar&curso=${curso}&clave=${encodeURIComponent(CLAVE)}`)}catch(e){}pedir()}};
+function alertaCampo(t){let p=$('#errurl');if(!p){p=document.createElement('div');p.id='errurl';p.className='aviso ro';$('#config').appendChild(p)}p.textContent=t}
+// ---------- modo prueba: alumnos inventados para ver cómo se ve ----------
+let sim=null;
+function simular(){
+  const ahora=Date.now();
+  if(!sim){sim={t0:ahora,al:Array.from({length:13},(_,i)=>({alumno:'Alumno de prueba '+(i+1),lista:i+1,estado:'trabajando',actividad:(BANCOS[curso]&&BANCOS[curso].actividades[0].nombre)||'T.P.',total:10,pregunta:1,respondidas:0,salidas:0,fuera_s:0,ultima:ahora})),alertas:[]}}
+  sim.al.forEach((a,i)=>{if(a.estado==='entregó')return;a.ultima=ahora;if(Math.random()<.35&&a.respondidas<10){a.respondidas++;a.pregunta=Math.min(10,a.respondidas+1)}
+    if(a.estado==='afuera'&&Math.random()<.5){a.estado='trabajando';a.fuera_s+=6;sim.alertas.push({t:ahora,alumno:a.alumno,lista:a.lista,tipo:'vuelta',texto:'Volvió a la página',detalle:'Estuvo afuera 6 s',grave:false})}
+    else if(a.estado==='trabajando'&&Math.random()<.03){a.estado='afuera';a.salidas++;sim.alertas.push({t:ahora,alumno:a.alumno,lista:a.lista,tipo:'salida',texto:'Salió de la página',detalle:'Salió de la página (otra app, otra pestaña o el inicio del celular)',grave:true})}
+    if(a.respondidas>=10&&Math.random()<.3){a.estado='entregó';a.nota=Math.max(1,Math.round(5+Math.random()*5))}});
+  return {alumnos:sim.al,alertas:sim.alertas.slice(-60),ahora,planilla:''};
+}
+if(URL_&&CLAVE)arrancar();
+})();
+</script>
+</body>
+</html>
