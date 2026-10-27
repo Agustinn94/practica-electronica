@@ -5,6 +5,8 @@ Páginas para que los alumnos de Electrónica 1 (4.° año) y Electrónica 2 (5.
 - `index.html`: elegir la materia.
 - `alumno.html?c=e1` y `alumno.html?c=e2`: práctica guiada sin nota, trabajo práctico con nota y ver el resumen para la carpeta.
 - `profe.html`: tablero del docente en vivo con los avisos de quién sale de la página y las notas.
+- `presentacion.html`: Electrónica Industrial 1, presentación del proyecto para proyectar (con voz; espacio o flechas para avanzar). El video `video-planta.mp4` va en la misma carpeta.
+- `industrial.html`: Electrónica Industrial 1, guía del proyecto planta de nivel (video con voz, conexiones paso a paso, simulador, programa y exposiciones). La carpeta `planta` tiene el programa del ESP32.
 - `banco-e1.js` y `banco-e2.js`: las preguntas, los códigos de los trabajos y el resumen.
 - `Codigo.gs`: lo que va en la planilla de Google (Extensiones > Apps Script).
 - `config.js`: la dirección de la planilla.

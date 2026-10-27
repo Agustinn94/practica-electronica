@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="es" class="app">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Planta de nivel · Industrial 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+:root{--fondo:#0d1b2a;--panel:#14263b;--panel2:#1b3350;--tinta:#eef4ff;--suave:#a9bdd6;--amb:#ffb020;--ve:#34d399;--ro:#f87171;--az:#60a5fa;--cel:#22d3ee;--borde:rgba(255,255,255,.14)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--fondo);color:var(--tinta);font-family:"Nunito","Segoe UI",system-ui,sans-serif;font-size:18px;line-height:1.45}
+header.barra{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#09131f;border-bottom:1px solid var(--borde);position:sticky;top:0;z-index:20}
+header.barra img{width:42px;height:42px;border-radius:50%;background:#fff}
+header.barra .t{font-weight:800;font-size:17px;line-height:1.15}
+header.barra .t small{display:block;font-weight:600;color:var(--suave);font-size:13px}
+nav.pestanas{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#0a1624;border-bottom:1px solid var(--borde);position:sticky;top:62px;z-index:19}
+nav.pestanas button{flex:0 0 auto;font:inherit;font-weight:800;font-size:15px;padding:8px 14px;border-radius:999px;border:1px solid var(--borde);background:var(--panel);color:var(--tinta);cursor:pointer}
+nav.pestanas button.on{background:var(--amb);color:#1b1200;border-color:var(--amb)}
+main{max-width:1100px;margin:0 auto;padding:14px 14px 80px}
+section.sec{display:none}section.sec.on{display:block}
+h1{font-size:30px;margin:10px 0 6px;line-height:1.15}h2{font-size:23px;margin:18px 0 8px}h3{font-size:19px;margin:12px 0 6px}
+p.sub{color:var(--suave);margin:0 0 14px}
+.tarjeta{background:var(--panel);border:1px solid var(--borde);border-radius:18px;padding:16px;margin:12px 0}
+.btn{display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:800;font-size:17px;padding:10px 18px;border-radius:14px;border:0;cursor:pointer;background:var(--cel);color:#04202a}
+.btn.sec2{background:var(--panel2);color:var(--tinta);border:1px solid var(--borde)}
+.btn.amb{background:var(--amb);color:#1b1200}
+.btn:disabled{opacity:.45;cursor:default}
+.fila{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--borde);font-weight:800;font-size:15px}
+.chip.ve{background:var(--ve);color:#05261a}.chip.ro{background:var(--ro);color:#2a0606}.chip.amb{background:var(--amb);color:#1b1200}
+.pasos{counter-reset:p;list-style:none;padding:0;margin:8px 0}
+.pasos li{counter-increment:p;position:relative;padding:8px 0 8px 46px;border-bottom:1px dashed var(--borde)}
+.pasos li::before{content:counter(p);position:absolute;left:0;top:6px;width:32px;height:32px;border-radius:50%;background:var(--amb);color:#1b1200;font-weight:900;display:flex;align-items:center;justify-content:center}
+.cuenta{color:var(--amb);font-weight:900}
+table.t{width:100%;border-collapse:collapse;font-size:16px}
+table.t th,table.t td{border:1px solid var(--borde);padding:8px;text-align:left;vertical-align:top}
+table.t th{background:var(--panel2)}
+.punto{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:6px;border:2px solid rgba(255,255,255,.6)}
+.aviso{border-left:5px solid var(--amb);background:#2a2110;padding:10px 14px;border-radius:10px;margin:10px 0}
+.ok{border-left:5px solid var(--ve);background:#0f2a20;padding:10px 14px;border-radius:10px;margin:10px 0}
+.formula{display:inline-block;background:#fff8e1;color:#3a2a00;border:2px solid var(--amb);border-radius:12px;padding:6px 16px;font-weight:900;font-size:22px;font-family:"Cambria Math","Times New Roman",serif}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g4{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:760px){.g2,.g4{grid-template-columns:1fr}h1{font-size:25px}}
+/* ---------- video ---------- */
+.escenario{position:relative;background:#081320;border-radius:18px;overflow:hidden;border:1px solid var(--borde)}
+.escenario svg{display:block;width:100%;height:auto}
+.subt{min-height:84px;background:#06101b;padding:12px 16px;font-size:21px;font-weight:700;text-align:center;border-top:1px solid var(--borde)}
+.puntos{display:flex;gap:6px;justify-content:center;margin:10px 0}
+.puntos i{width:12px;height:12px;border-radius:50%;background:var(--panel2);cursor:pointer}.puntos i.on{background:var(--amb)}
+.esc{display:none}.esc.on{display:inline}
+@keyframes subeBaja{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(.9)}}
+@keyframes aparece{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes dibuja{from{stroke-dashoffset:var(--L,600)}to{stroke-dashoffset:0}}
+@keyframes onda{0%{transform:translateY(0);opacity:0}10%{opacity:1}45%{transform:translateY(190px);opacity:1}50%{opacity:0}100%{opacity:0;transform:translateY(190px)}}
+@keyframes eco{0%,50%{transform:translateY(190px);opacity:0}55%{opacity:1}95%{transform:translateY(0);opacity:1}100%{opacity:0}}
+@keyframes brazo{0%,40%{transform:rotate(-38deg)}50%,90%{transform:rotate(0)}100%{transform:rotate(-38deg)}}
+@keyframes aprieta{0%,40%{transform:scaleY(1)}50%,90%{transform:scaleY(.25)}100%{transform:scaleY(1)}}
+@keyframes gota{0%{transform:translateY(0);opacity:1}80%{opacity:1}100%{transform:translateY(120px);opacity:0}}
+@keyframes gotas{0%,38%{opacity:1}45%,92%{opacity:0}100%{opacity:1}}
+@keyframes manija{0%,15%{transform:rotate(0)}25%,100%{transform:rotate(90deg)}}
+@keyframes nivelPert{0%,20%{transform:scaleY(.8)}55%{transform:scaleY(.3)}100%{transform:scaleY(.8)}}
+@keyframes chorro{0%,20%{opacity:0}25%,100%{opacity:1}}
+@keyframes entra{0%,50%{opacity:0}55%,95%{opacity:1}100%{opacity:0}}
+@keyframes pulso{0%,100%{opacity:.35}50%{opacity:1}}
+.run .a-agua{transform-box:fill-box;transform-origin:bottom;animation:subeBaja 6s ease-in-out infinite}
+.run .a-ap{opacity:0;animation:aparece .7s ease forwards}
+.run .a-dib{stroke-dasharray:var(--L,600);stroke-dashoffset:var(--L,600);animation:dibuja 1.2s ease forwards}
+.run .a-onda{transform-box:fill-box;animation:onda 2.4s linear infinite}
+.run .a-eco{transform-box:fill-box;animation:eco 2.4s linear infinite}
+.run .a-brazo{transform-box:view-box;transform-origin:520px 210px;animation:brazo 5s ease-in-out infinite}
+.run .a-aprieta{transform-box:fill-box;transform-origin:center;animation:aprieta 5s ease-in-out infinite}
+.run .a-gota{animation:gota .9s linear infinite}
+.run .a-gotas{animation:gotas 5s ease-in-out infinite}
+.run .a-manija{transform-box:fill-box;transform-origin:center;animation:manija 9s ease-in-out forwards}
+.run .a-nivp{transform-box:fill-box;transform-origin:bottom;animation:nivelPert 9s ease-in-out forwards}
+.run .a-chorro{opacity:0;animation:chorro 9s linear forwards}
+.run .a-entra{opacity:0;animation:entra 9s linear forwards}
+.run .a-pulso{animation:pulso 1.2s ease-in-out infinite}
+/* ---------- conexiones ---------- */
+.banco{background:#e9eef4;border-radius:18px;overflow:hidden;border:1px solid var(--borde)}
+.banco svg{display:block;width:100%;height:auto}
+.cable{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset 1.3s ease}
+.cable-borde{fill:none;stroke:#0008;stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.3s ease}
+.pin{cursor:pointer}
+.pin.brilla{animation:pulso .9s ease-in-out infinite}
+.oculto{opacity:0;transition:opacity .6s}.visible{opacity:1;transition:opacity .6s}
+.info-paso{min-height:150px}
+.info-paso .lista{margin:8px 0;padding:0;list-style:none}
+.info-paso .lista li{margin:6px 0;font-size:18px}
+#tooltipPin{position:fixed;pointer-events:none;background:#000d;color:#fff;padding:6px 10px;border-radius:8px;font-size:15px;display:none;z-index:50;max-width:260px}
+/* ---------- simulador ---------- */
+.sim{display:grid;grid-template-columns:1.25fr 1fr;gap:12px}
+@media(max-width:860px){.sim{grid-template-columns:1fr}}
+.lect{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.lect div{background:var(--panel2);border-radius:12px;padding:8px 10px}
+.lect b{display:block;font-size:26px}
+.lect span{color:var(--suave);font-size:14px}
+input[type=range]{width:100%}
+canvas#graf{width:100%;height:220px;background:#081320;border-radius:12px;display:block}
+</style>
+</head>
+<body>
+<header class="barra"><img src="logo.jpg" alt="IAT"><div class="t">Planta de nivel · Electrónica Industrial 1<small>Instituto Técnico «Ing. Anacleto Tobar» · 6.° año · Lic. Gutiérrez</small></div></header>
+<nav class="pestanas" id="pestanas">
+ <button data-s="video" class="on">1 · Video</button>
+ <button data-s="conexiones">2 · Conexiones</button>
+ <button data-s="simulador">3 · Simulador</button>
+ <button data-s="cargar">4 · Cargar el programa</button>
+ <button data-s="celular">5 · Celular y calibración</button>
+ <button data-s="grupos">6 · Qué hace cada grupo</button>
+ <button data-s="exposiciones">7 · Exposiciones</button>
+</nav>
+<main>
+
+<!-- ======================= 1 · VIDEO ======================= -->
+<section class="sec on" id="video">
+<h1>Una planta de nivel con un solo ESP32</h1>
+<p><a class="btn amb" href="presentacion.html" style="text-decoration:none">▶ Ver la presentación del proyecto</a></p>
+<p class="sub">Tocá «Reproducir» y subí el volumen. La voz es la del navegador; si no se escucha, igual van apareciendo los subtítulos.</p>
+<div class="escenario">
+<svg viewBox="0 0 960 540" id="esc">
+ <defs>
+  <linearGradient id="gAgua" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5ad1ff"/><stop offset="1" stop-color="#1572c8"/></linearGradient>
+  <linearGradient id="gMetal" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f3f5f8"/><stop offset="1" stop-color="#9aa3ad"/></linearGradient>
+  <marker id="flecha" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ffb020"/></marker>
+ </defs>
+ <!-- Escena 1: presentación -->
+ <g class="esc" id="e0">
+  <rect x="0" y="0" width="960" height="540" fill="#081320"/>
+  <g transform="translate(600,120)">
+   <rect x="0" y="0" width="200" height="300" rx="14" fill="#0d2238" stroke="#7dd3fc" stroke-width="5"/>
+   <rect class="a-agua" x="6" y="20" width="188" height="274" rx="10" fill="url(#gAgua)"/>
+   <rect x="40" y="-40" width="120" height="40" rx="8" fill="#2f6fb5"/><circle cx="72" cy="-20" r="15" fill="url(#gMetal)"/><circle cx="128" cy="-20" r="15" fill="url(#gMetal)"/>
+  </g>
+  <text class="a-ap" x="80" y="210" fill="#eef4ff" font-size="58" font-weight="900">Planta de nivel</text>
+  <text class="a-ap" style="animation-delay:.4s" x="82" y="262" fill="#ffb020" font-size="28" font-weight="800">Un lazo de control de verdad,</text>
+  <text class="a-ap" style="animation-delay:.6s" x="82" y="300" fill="#ffb020" font-size="28" font-weight="800">con un solo ESP32</text>
+  <text class="a-ap" style="animation-delay:1s" x="82" y="370" fill="#a9bdd6" font-size="22">Electrónica Industrial 1 · 6.° año</text>
+ </g>
+ <!-- Escena 2: las cuatro partes del lazo -->
+ <g class="esc" id="e1">
+  <rect x="0" y="0" width="960" height="540" fill="#081320"/>
+  <text x="480" y="60" text-anchor="middle" fill="#eef4ff" font-size="32" font-weight="900">Las cuatro partes del lazo</text>
+  <g class="a-ap"><rect x="360" y="95" width="240" height="90" rx="16" fill="#1b3350" stroke="#22d3ee" stroke-width="3"/><text x="480" y="133" text-anchor="middle" fill="#22d3ee" font-size="26" font-weight="900">SENSOR</text><text x="480" y="165" text-anchor="middle" fill="#eef4ff" font-size="19">HC-SR04: mide</text></g>
+  <g class="a-ap" style="animation-delay:.9s"><rect x="660" y="225" width="250" height="90" rx="16" fill="#1b3350" stroke="#ffb020" stroke-width="3"/><text x="785" y="263" text-anchor="middle" fill="#ffb020" font-size="26" font-weight="900">CONTROLADOR</text><text x="785" y="295" text-anchor="middle" fill="#eef4ff" font-size="19">ESP32: compara y decide</text></g>
+  <g class="a-ap" style="animation-delay:1.8s"><rect x="360" y="360" width="240" height="90" rx="16" fill="#1b3350" stroke="#34d399" stroke-width="3"/><text x="480" y="398" text-anchor="middle" fill="#34d399" font-size="26" font-weight="900">VÁLVULA</text><text x="480" y="430" text-anchor="middle" fill="#eef4ff" font-size="19">pinza con servo: actúa</text></g>
+  <g class="a-ap" style="animation-delay:2.7s"><rect x="50" y="225" width="250" height="90" rx="16" fill="#1b3350" stroke="#60a5fa" stroke-width="3"/><text x="175" y="263" text-anchor="middle" fill="#60a5fa" font-size="26" font-weight="900">PROCESO</text><text x="175" y="295" text-anchor="middle" fill="#eef4ff" font-size="19">el tanque: responde</text></g>
+  <path class="a-dib" style="--L:240;animation-delay:.5s" d="M600,140 C700,140 785,170 785,222" stroke="#ffb020" stroke-width="5" fill="none" marker-end="url(#flecha)"/>
+  <path class="a-dib" style="--L:240;animation-delay:1.4s" d="M785,318 C785,370 700,405 603,405" stroke="#ffb020" stroke-width="5" fill="none" marker-end="url(#flecha)"/>
+  <path class="a-dib" style="--L:240;animation-delay:2.3s" d="M360,405 C260,405 175,370 175,318" stroke="#ffb020" stroke-width="5" fill="none" marker-end="url(#flecha)"/>
+  <path class="a-dib" style="--L:240;animation-delay:3.2s" d="M175,222 C175,170 260,140 357,140" stroke="#ffb020" stroke-width="5" fill="none" marker-end="url(#flecha)"/>
+  <text class="a-ap" style="animation-delay:3.8s" x="480" y="282" text-anchor="middle" fill="#a9bdd6" font-size="22" font-weight="800">realimentación</text>
+  <text class="a-ap" style="animation-delay:4.4s" x="480" y="510" text-anchor="middle" fill="#a9bdd6" font-size="18">Creus, Instrumentación industrial, fig. 1.2</text>
+ </g>
+ <!-- Escena 3: cómo mide el ultrasonido -->
+ <g class="esc" id="e2">
+  <rect x="0" y="0" width="960" height="540" fill="#081320"/>
+  <text x="40" y="60" fill="#eef4ff" font-size="32" font-weight="900">¿Cómo mide el sensor?</text>
+  <g transform="translate(110,110)">
+   <rect x="0" y="0" width="260" height="70" rx="10" fill="#2f6fb5"/>
+   <circle cx="70" cy="35" r="28" fill="url(#gMetal)"/><circle cx="190" cy="35" r="28" fill="url(#gMetal)"/>
+   <text x="130" y="-10" text-anchor="middle" fill="#22d3ee" font-size="18" font-weight="800">HC-SR04</text>
+   <rect x="-20" y="70" width="300" height="310" fill="none" stroke="#7dd3fc" stroke-width="4"/>
+   <rect x="-17" y="270" width="294" height="108" fill="url(#gAgua)"/>
+   <g class="a-onda"><path d="M30,90 Q70,108 110,90" stroke="#ffb020" stroke-width="5" fill="none"/><path d="M30,104 Q70,122 110,104" stroke="#ffb020" stroke-width="4" fill="none" opacity=".6"/></g>
+   <g class="a-eco"><path d="M150,90 Q190,72 230,90" stroke="#22d3ee" stroke-width="5" fill="none"/><path d="M150,104 Q190,86 230,104" stroke="#22d3ee" stroke-width="4" fill="none" opacity=".6"/></g>
+   <text x="62" y="250" fill="#ffb020" font-size="17" font-weight="800">va</text><text x="186" y="250" fill="#22d3ee" font-size="17" font-weight="800">vuelve</text>
+  </g>
+  <g class="a-ap" style="animation-delay:1.5s"><text x="500" y="200" fill="#eef4ff" font-size="24" font-weight="800">El sonido va y vuelve:</text>
+   <rect x="500" y="225" width="330" height="80" rx="14" fill="#fff8e1" stroke="#ffb020" stroke-width="3"/>
+   <text x="665" y="278" text-anchor="middle" fill="#3a2a00" font-size="38" font-weight="900" font-family="Cambria Math,Times New Roman,serif">d = v · t / 2</text></g>
+  <g class="a-ap" style="animation-delay:2.5s"><text x="500" y="350" fill="#a9bdd6" font-size="21">v ≈ 343 m/s (velocidad del sonido en el aire)</text>
+   <text x="500" y="384" fill="#a9bdd6" font-size="21">t = lo que tardó el eco</text>
+   <text x="500" y="418" fill="#a9bdd6" font-size="21">d = distancia del sensor al agua</text></g>
+ </g>
+ <!-- Escena 4: válvula de pinza -->
+ <g class="esc" id="e3">
+  <rect x="0" y="0" width="960" height="540" fill="#081320"/>
+  <text x="40" y="60" fill="#eef4ff" font-size="32" font-weight="900">¿Cómo actúa la válvula de pinza?</text>
+  <rect x="120" y="270" width="720" height="34" rx="17" fill="#cfe8ff" opacity=".9"/>
+  <rect class="a-aprieta" x="490" y="270" width="60" height="34" fill="#cfe8ff"/>
+  <g class="a-gotas"><circle class="a-gota" cx="820" cy="320" r="8" fill="#38bdf8"/><circle class="a-gota" style="animation-delay:.3s" cx="820" cy="320" r="7" fill="#38bdf8"/><circle class="a-gota" style="animation-delay:.6s" cx="820" cy="320" r="8" fill="#38bdf8"/></g>
+  <rect x="470" y="140" width="100" height="70" rx="8" fill="#2563eb"/><text x="520" y="183" text-anchor="middle" fill="#fff" font-size="18" font-weight="800">SG90</text>
+  <g class="a-brazo"><rect x="510" y="206" width="20" height="74" rx="8" fill="#f8fafc"/></g>
+  <text class="a-ap" x="120" y="380" fill="#a9bdd6" font-size="22">El servo aprieta la manguera: no pasa el agua.</text>
+  <text class="a-ap" style="animation-delay:.5s" x="120" y="414" fill="#a9bdd6" font-size="22">La suelta: pasa. Nada del mecanismo toca el líquido.</text>
+  <text class="a-ap" style="animation-delay:1s" x="120" y="460" fill="#34d399" font-size="22" font-weight="800">Se usa en laboratorios, alimentos y máquinas de diálisis.</text>
+ </g>
+ <!-- Escena 5: todo-nada con histéresis -->
+ <g class="esc" id="e4">
+  <rect x="0" y="0" width="960" height="540" fill="#081320"/>
+  <text x="40" y="60" fill="#eef4ff" font-size="32" font-weight="900">Control todo-nada con histéresis</text>
+  <line x1="100" y1="420" x2="900" y2="420" stroke="#a9bdd6" stroke-width="3"/><line x1="100" y1="420" x2="100" y2="100" stroke="#a9bdd6" stroke-width="3"/>
+  <text x="70" y="110" fill="#a9bdd6" font-size="17" text-anchor="end">100 %</text><text x="70" y="425" fill="#a9bdd6" font-size="17" text-anchor="end">0 %</text>
+  <line x1="100" y1="164" x2="900" y2="164" stroke="#f87171" stroke-width="3" stroke-dasharray="10 8"/><text x="905" y="160" fill="#f87171" font-size="18" font-weight="800">80 %</text><text x="905" y="182" fill="#f87171" font-size="15">cierra</text>
+  <line x1="100" y1="324" x2="900" y2="324" stroke="#34d399" stroke-width="3" stroke-dasharray="10 8"/><text x="905" y="320" fill="#34d399" font-size="18" font-weight="800">30 %</text><text x="905" y="342" fill="#34d399" font-size="15">abre</text>
+  <path class="a-dib" style="--L:1500;animation-duration:7s" d="M100,250 L170,324 L260,164 L350,324 L440,164 L530,324 L620,164 L710,324 L800,164 L890,324" stroke="#38bdf8" stroke-width="5" fill="none"/>
+  <text x="110" y="470" fill="#eef4ff" font-size="19" font-weight="800">Pinza:</text>
+  <g class="a-ap" style="animation-delay:.8s"><rect x="170" y="452" width="90" height="26" fill="#34d399"/><text x="215" y="471" text-anchor="middle" font-size="15" font-weight="800">abierta</text></g>
+  <g class="a-ap" style="animation-delay:1.6s"><rect x="260" y="452" width="90" height="26" fill="#f87171"/><text x="305" y="471" text-anchor="middle" font-size="15" font-weight="800">cerrada</text></g>
+  <g class="a-ap" style="animation-delay:2.4s"><rect x="350" y="452" width="90" height="26" fill="#34d399"/><text x="395" y="471" text-anchor="middle" font-size="15" font-weight="800">abierta</text></g>
+  <g class="a-ap" style="animation-delay:3.2s"><rect x="440" y="452" width="90" height="26" fill="#f87171"/><text x="485" y="471" text-anchor="middle" font-size="15" font-weight="800">cerrada</text></g>
+  <text class="a-ap" style="animation-delay:4s" x="110" y="515" fill="#ffb020" font-size="20" font-weight="800">La franja entre 30 % y 80 % evita que la válvula prenda y apague sin parar.</text>
+ </g>
+ <!-- Escena 6: perturbación -->
+ <g class="esc" id="e5">
+  <rect x="0" y="0" width="960" height="540" fill="#081320"/>
+  <text x="40" y="60" fill="#eef4ff" font-size="32" font-weight="900">Abrís la esférica… y la planta se rellena sola</text>
+  <g transform="translate(330,110)">
+   <rect x="-160" y="-20" width="120" height="110" rx="10" fill="#0d2238" stroke="#7dd3fc" stroke-width="3"/><rect x="-156" y="20" width="112" height="66" fill="url(#gAgua)"/>
+   <text x="-100" y="-30" text-anchor="middle" fill="#a9bdd6" font-size="15">reservorio</text>
+   <path d="M-40,70 L40,70 L40,110" stroke="#cfe8ff" stroke-width="12" fill="none"/>
+   <rect x="-10" y="54" width="34" height="32" rx="4" fill="#2563eb"/><text x="7" y="45" text-anchor="middle" fill="#34d399" font-size="14" font-weight="800">pinza</text>
+   <circle class="a-entra a-gota" cx="40" cy="120" r="7" fill="#38bdf8"/>
+   <rect x="0" y="110" width="220" height="260" rx="10" fill="#0d2238" stroke="#7dd3fc" stroke-width="5"/>
+   <rect class="a-nivp" x="5" y="130" width="210" height="236" rx="8" fill="url(#gAgua)"/>
+   <rect x="60" y="80" width="100" height="30" rx="6" fill="#2f6fb5"/><text x="110" y="74" text-anchor="middle" fill="#22d3ee" font-size="14" font-weight="800">sensor</text>
+   <path d="M220,345 L300,345" stroke="#cfe8ff" stroke-width="12"/>
+   <circle cx="262" cy="345" r="16" fill="#f97316"/><rect class="a-manija" x="256" y="315" width="12" height="30" rx="4" fill="#fed7aa"/>
+   <text x="262" y="395" text-anchor="middle" fill="#f97316" font-size="15" font-weight="800">esférica</text>
+   <path class="a-chorro" d="M300,345 Q330,350 330,420" stroke="#38bdf8" stroke-width="8" fill="none"/>
+  </g>
+  <text class="a-ap" style="animation-delay:2s" x="640" y="200" fill="#f97316" font-size="22" font-weight="800">1. Baja el nivel</text>
+  <text class="a-ap" style="animation-delay:4s" x="640" y="250" fill="#22d3ee" font-size="22" font-weight="800">2. El sensor lo nota</text>
+  <text class="a-ap" style="animation-delay:5s" x="640" y="300" fill="#ffb020" font-size="22" font-weight="800">3. El ESP32 abre la pinza</text>
+  <text class="a-ap" style="animation-delay:6s" x="640" y="350" fill="#34d399" font-size="22" font-weight="800">4. Se rellena solo</text>
+ </g>
+ <!-- Escena 7: grupos -->
+ <g class="esc" id="e6">
+  <rect x="0" y="0" width="960" height="540" fill="#081320"/>
+  <text x="480" y="60" text-anchor="middle" fill="#eef4ff" font-size="32" font-weight="900">Cada grupo, una parte de la planta</text>
+  <g class="a-ap"><rect x="60" y="100" width="400" height="150" rx="16" fill="#1b3350" stroke="#22d3ee" stroke-width="3"/><text x="90" y="150" fill="#22d3ee" font-size="26" font-weight="900">El sensor</text><text x="90" y="190" fill="#eef4ff" font-size="19">montarlo, calibrarlo</text><text x="90" y="220" fill="#eef4ff" font-size="19">y medir cuánto se equivoca</text></g>
+  <g class="a-ap" style="animation-delay:.6s"><rect x="500" y="100" width="400" height="150" rx="16" fill="#1b3350" stroke="#34d399" stroke-width="3"/><text x="530" y="150" fill="#34d399" font-size="26" font-weight="900">La pinza</text><text x="530" y="190" fill="#eef4ff" font-size="19">ángulos del servo</text><text x="530" y="220" fill="#eef4ff" font-size="19">y cuánto líquido deja pasar</text></g>
+  <g class="a-ap" style="animation-delay:1.2s"><rect x="60" y="275" width="400" height="150" rx="16" fill="#1b3350" stroke="#f97316" stroke-width="3"/><text x="90" y="325" fill="#f97316" font-size="26" font-weight="900">El tanque y la esférica</text><text x="90" y="365" fill="#eef4ff" font-size="19">armar el tanque y medir</text><text x="90" y="395" fill="#eef4ff" font-size="19">cuánto sale por la esférica</text></g>
+  <g class="a-ap" style="animation-delay:1.8s"><rect x="500" y="275" width="400" height="150" rx="16" fill="#1b3350" stroke="#ffb020" stroke-width="3"/><text x="530" y="325" fill="#ffb020" font-size="26" font-weight="900">El control y el celular</text><text x="530" y="365" fill="#eef4ff" font-size="19">cargar el programa y registrar</text><text x="530" y="395" fill="#eef4ff" font-size="19">cómo se mueve el nivel</text></g>
+  <text class="a-ap" style="animation-delay:2.6s" x="480" y="490" text-anchor="middle" fill="#ffb020" font-size="26" font-weight="900">Ahora, a conectar cable por cable</text>
+ </g>
+</svg>
+<div class="subt" id="subt">Tocá «Reproducir» para empezar.</div>
+</div>
+<div class="puntos" id="puntos"></div>
+<div class="fila" style="justify-content:center">
+ <button class="btn sec2" id="vAnt">◀ Anterior</button>
+ <button class="btn amb" id="vPlay">▶ Reproducir</button>
+ <button class="btn sec2" id="vSig">Siguiente ▶</button>
+</div>
+</section>
+
+<!-- ======================= 2 · CONEXIONES ======================= -->
+<section class="sec" id="conexiones">
+<h1>Conexiones, cable por cable</h1>
+<p class="sub">Tocá «Siguiente» y mirá cómo se arma. Si apoyás el dedo o el mouse sobre una pata, te dice qué es. <span class="cuenta" id="cuentaPaso">Paso 1 de 8</span></p>
+<div class="banco">
+<svg viewBox="0 0 1000 620" id="banco">
+ <defs>
+  <linearGradient id="gModulo" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#e8ebef"/><stop offset="1" stop-color="#b8bec6"/></linearGradient>
+  <linearGradient id="gTrans" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#f4f6f8"/><stop offset="1" stop-color="#9aa3ad"/></linearGradient>
+  <pattern id="malla" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#aab2bb"/><circle cx="3" cy="3" r="1.4" fill="#5f6873"/></pattern>
+ </defs>
+ <text x="20" y="34" font-size="20" font-weight="800" fill="#334155">Banco de trabajo</text>
+ <!-- protoboard -->
+ <g id="proto">
+  <rect x="640" y="330" width="345" height="275" rx="10" fill="#fbfbf7" stroke="#cfd5dc" stroke-width="2"/>
+  <line x1="655" y1="548" x2="972" y2="548" stroke="#e11d48" stroke-width="3"/><text x="648" y="545" font-size="18" fill="#e11d48" font-weight="900">+</text>
+  <line x1="655" y1="597" x2="972" y2="597" stroke="#2563eb" stroke-width="3"/><text x="648" y="602" font-size="18" fill="#2563eb" font-weight="900">−</text>
+  <g id="agujeros"></g>
+  <text x="812" y="352" text-anchor="middle" font-size="15" fill="#64748b" font-weight="700">protoboard</text>
+ </g>
+ <!-- ESP32 DevKit V1 30 patas -->
+ <g id="esp32">
+  <rect x="400" y="40" width="170" height="505" rx="10" fill="#1f2430"/>
+  <rect x="420" y="48" width="130" height="90" rx="6" fill="url(#gModulo)"/>
+  <path d="M430,56 h20 v14 h-12 v8 h22 v-22 h16 v22 h18 v-22 h16 v22" stroke="#7a828c" stroke-width="3" fill="none"/>
+  <text x="485" y="122" text-anchor="middle" font-size="13" fill="#3b4550" font-weight="800">ESP-WROOM-32</text>
+  <text x="485" y="262" text-anchor="middle" font-size="16" fill="#e2e8f0" font-weight="900">ESP32</text>
+  <rect x="424" y="500" width="22" height="14" rx="3" fill="#0f172a" stroke="#94a3b8"/><text x="435" y="530" text-anchor="middle" font-size="10" fill="#cbd5e1">EN</text>
+  <rect x="524" y="500" width="22" height="14" rx="3" fill="#0f172a" stroke="#94a3b8"/><text x="535" y="530" text-anchor="middle" font-size="10" fill="#cbd5e1">BOOT</text>
+  <rect x="465" y="527" width="40" height="26" rx="4" fill="#c0c6cc" stroke="#6b7280"/>
+  <g id="pinesEsp"></g>
+  <path d="M485,553 C485,580 470,600 430,614" stroke="#111" stroke-width="9" fill="none"/>
+  <text x="190" y="612" font-size="15" fill="#334155" font-weight="700">cable USB a la compu</text>
+ </g>
+ <!-- HC-SR04 -->
+ <g id="hcsr04">
+  <rect x="650" y="40" width="280" height="112" rx="8" fill="#1d5fa8"/>
+  <circle cx="720" cy="96" r="44" fill="url(#gTrans)"/><circle cx="720" cy="96" r="30" fill="url(#malla)"/>
+  <circle cx="860" cy="96" r="44" fill="url(#gTrans)"/><circle cx="860" cy="96" r="30" fill="url(#malla)"/>
+  <text x="790" y="62" text-anchor="middle" font-size="13" fill="#e2e8f0" font-weight="800">HC-SR04</text>
+  <g id="pinesHC"></g>
+ </g>
+ <!-- Servo SG90 -->
+ <g id="servo">
+  <rect x="70" y="230" width="170" height="74" rx="6" fill="#2563eb"/>
+  <rect x="50" y="252" width="210" height="14" rx="4" fill="#1d4ed8"/>
+  <circle cx="110" cy="230" r="20" fill="#1e40af"/><circle cx="110" cy="222" r="9" fill="#f8fafc"/>
+  <rect x="104" y="174" width="12" height="52" rx="6" fill="#f8fafc"/>
+  <text x="170" y="290" text-anchor="middle" font-size="16" fill="#fff" font-weight="900">SG90</text>
+  <path d="M240,284 C270,284 280,268 300,268" stroke="#7c4a1e" stroke-width="5" fill="none"/>
+  <path d="M240,290 C270,290 280,284 300,284" stroke="#dc2626" stroke-width="5" fill="none"/>
+  <path d="M240,296 C270,296 280,300 300,300" stroke="#f59e0b" stroke-width="5" fill="none"/>
+  <rect x="298" y="258" width="22" height="52" rx="3" fill="#111827"/>
+  <g id="pinesServo"></g>
+  <text x="155" y="335" text-anchor="middle" font-size="15" fill="#334155" font-weight="700">servo de la pinza</text>
+ </g>
+ <!-- Resistencias del divisor -->
+ <g id="resistencias" class="oculto">
+  <g id="r1"><line x1="720" y1="450" x2="742" y2="450" stroke="#9ca3af" stroke-width="3"/><line x1="778" y1="450" x2="800" y2="450" stroke="#9ca3af" stroke-width="3"/>
+   <rect x="742" y="440" width="36" height="20" rx="8" fill="#e8c9a0"/><rect x="749" y="440" width="4" height="20" fill="#7c4a1e"/><rect x="757" y="440" width="4" height="20" fill="#111"/><rect x="765" y="440" width="4" height="20" fill="#dc2626"/><rect x="772" y="440" width="3" height="20" fill="#c9a227"/>
+   <text x="760" y="432" text-anchor="middle" font-size="14" fill="#334155" font-weight="800">1 kΩ</text></g>
+  <g id="r2"><line x1="800" y1="490" x2="800" y2="512" stroke="#9ca3af" stroke-width="3"/><line x1="800" y1="548" x2="800" y2="585" stroke="#9ca3af" stroke-width="3"/>
+   <rect x="790" y="512" width="20" height="36" rx="8" fill="#e8c9a0"/><rect x="790" y="518" width="20" height="4" fill="#dc2626"/><rect x="790" y="526" width="20" height="4" fill="#111"/><rect x="790" y="534" width="20" height="4" fill="#dc2626"/><rect x="790" y="541" width="20" height="3" fill="#c9a227"/>
+   <text x="840" y="534" font-size="14" fill="#334155" font-weight="800">2 kΩ</text></g>
+ </g>
+ <g id="cables"></g>
+</svg>
+</div>
+<div class="tarjeta info-paso" id="infoPaso"></div>
+<div class="fila" style="justify-content:center">
+ <button class="btn sec2" id="cAnt">◀ Anterior</button>
+ <button class="btn amb" id="cSig">Siguiente ▶</button>
+ <button class="btn sec2" id="cTodo">Ver todo armado</button>
+</div>
+<h2>Tabla para chequear</h2>
+<table class="t">
+<tr><th>Cable</th><th>Desde</th><th>Hasta</th><th>Qué hace</th></tr>
+<tr><td><span class="punto" style="background:#111"></span>negro</td><td>GND del ESP32</td><td>fila − del protoboard</td><td>la masa común; sin esto nada funciona</td></tr>
+<tr><td><span class="punto" style="background:#e11d48"></span>rojo</td><td>VIN del ESP32</td><td>fila + del protoboard</td><td>reparte los 5 V del USB</td></tr>
+<tr><td><span class="punto" style="background:#e11d48"></span>rojo</td><td>VCC del HC-SR04</td><td>fila +</td><td>el sensor necesita 5 V</td></tr>
+<tr><td><span class="punto" style="background:#111"></span>negro</td><td>GND del HC-SR04</td><td>fila −</td><td>masa común</td></tr>
+<tr><td><span class="punto" style="background:#16a34a"></span>verde</td><td>TRIG del HC-SR04</td><td>D5 del ESP32</td><td>la orden de «medí ahora»</td></tr>
+<tr><td><span class="punto" style="background:#eab308"></span>amarillo</td><td>ECHO del HC-SR04</td><td>resistencia de 1 kΩ</td><td>trae el eco, pero a 5 V</td></tr>
+<tr><td><span class="punto" style="background:#2563eb"></span>azul</td><td>entre 1 kΩ y 2 kΩ</td><td>D18 del ESP32</td><td>el eco ya bajado a 3,3 V</td></tr>
+<tr><td><span class="punto" style="background:#7c4a1e"></span>marrón del servo</td><td>servo</td><td>GND del ESP32 (lado izquierdo)</td><td>masa común</td></tr>
+<tr><td><span class="punto" style="background:#dc2626"></span>rojo del servo</td><td>servo</td><td>fila +</td><td>le da 5 V al motorcito</td></tr>
+<tr><td><span class="punto" style="background:#f59e0b"></span>naranja del servo</td><td>servo</td><td>D27 del ESP32</td><td>la orden de posición</td></tr>
+</table>
+<div class="aviso"><b>Si tu ESP32 es distinto al del dibujo</b> (por ejemplo de 38 patas): las patas pueden estar en otro orden. Buscá las etiquetas impresas en la placa: D5 o G5, D18 o G18, D27 o G27, GND, y VIN, que en algunas placas dice 5V.</div>
+<div class="aviso"><b>¿No tienen resistencia de 2 kΩ?</b> Pongan dos de 1 kΩ en serie: suman 2 kΩ y el divisor queda igual.</div>
+</section>
+
+<!-- ======================= 3 · SIMULADOR ======================= -->
+<section class="sec" id="simulador">
+<h1>Simulador de la planta</h1>
+<p class="sub">Funciona igual que el programa del ESP32. Abrí la esférica para que se vacíe el tanque y mirá qué hace el control.</p>
+<div class="sim">
+ <div class="tarjeta" style="padding:8px">
+  <svg viewBox="0 0 560 400" id="simSvg" style="width:100%;height:auto;display:block">
+   <rect x="0" y="0" width="560" height="400" fill="#081320" rx="12"/>
+   <rect x="30" y="40" width="110" height="100" rx="8" fill="#0d2238" stroke="#7dd3fc" stroke-width="3"/><rect x="34" y="70" width="102" height="66" fill="#1572c8"/>
+   <text x="85" y="30" text-anchor="middle" fill="#a9bdd6" font-size="14">reservorio</text>
+   <path d="M140,120 L300,120 L300,150" stroke="#cfe8ff" stroke-width="12" fill="none"/>
+   <rect id="sHose" x="196" y="114" width="40" height="12" fill="#cfe8ff"/>
+   <rect x="200" y="78" width="40" height="30" rx="4" fill="#2563eb"/>
+   <rect id="sBrazo" x="214" y="100" width="12" height="22" rx="4" fill="#f8fafc"/>
+   <text x="220" y="70" text-anchor="middle" fill="#34d399" font-size="14" font-weight="800">pinza</text>
+   <g id="sGotas"><circle cx="300" cy="165" r="5" fill="#38bdf8"/><circle cx="300" cy="185" r="5" fill="#38bdf8"/><circle cx="300" cy="205" r="5" fill="#38bdf8"/></g>
+   <rect x="220" y="150" width="180" height="210" rx="8" fill="#0d2238" stroke="#7dd3fc" stroke-width="4"/>
+   <rect id="sAgua" x="224" y="250" width="172" height="106" fill="#1e88e5"/>
+   <line id="sLineaA" x1="224" x2="396" y1="200" y2="200" stroke="#f87171" stroke-width="2" stroke-dasharray="6 5"/>
+   <line id="sLineaB" x1="224" x2="396" y1="300" y2="300" stroke="#34d399" stroke-width="2" stroke-dasharray="6 5"/>
+   <rect x="330" y="128" width="64" height="22" rx="4" fill="#2f6fb5"/><text x="362" y="122" text-anchor="middle" fill="#22d3ee" font-size="13" font-weight="800">sensor</text>
+   <line id="sHaz" x1="362" y1="150" x2="362" y2="250" stroke="#ffb020" stroke-width="2" stroke-dasharray="4 4"/>
+   <path d="M400,340 L480,340" stroke="#cfe8ff" stroke-width="12"/>
+   <circle cx="445" cy="340" r="14" fill="#f97316"/><rect id="sManija" x="440" y="312" width="10" height="28" rx="3" fill="#fed7aa"/>
+   <text x="445" y="380" text-anchor="middle" fill="#f97316" font-size="14" font-weight="800">esférica</text>
+   <path id="sChorro" d="M480,340 Q505,345 505,395" stroke="#38bdf8" stroke-width="7" fill="none" opacity="0"/>
+  </svg>
+ </div>
+ <div>
+  <div class="lect">
+   <div><span>Distancia medida</span><b id="lDist">--</b></div>
+   <div><span>Nivel</span><b id="lNivel">--</b></div>
+   <div><span>Señal 4-20 mA</span><b id="lMa">--</b></div>
+   <div><span>Pinza</span><b id="lPinza">--</b></div>
+  </div>
+  <div class="tarjeta" style="padding:12px">
+   <div class="fila"><b>Modo:</b> <button class="btn" id="sAuto">Automático</button><button class="btn sec2" id="sManual">Manual</button></div>
+   <div class="fila" style="margin-top:8px"><button class="btn sec2" id="sAbrir">Abrir pinza</button><button class="btn sec2" id="sCerrar">Cerrar pinza</button><button class="btn sec2" id="sDosis">Dosificar 2 s</button></div>
+   <p style="margin:12px 0 2px"><b>Esférica (consumo):</b> <span id="vEsf">cerrada</span></p>
+   <input type="range" id="rEsf" min="0" max="100" value="0">
+   <p style="margin:10px 0 2px"><b>Abre al bajar del</b> <span id="vNB">30</span> % · <b>cierra al llegar al</b> <span id="vNA">80</span> %</p>
+   <input type="range" id="rNB" min="5" max="90" value="30"><input type="range" id="rNA" min="10" max="95" value="80">
+   <p style="margin:8px 0 0;color:var(--suave)">Cambios de la pinza: <b id="lCambios">0</b> · <button class="btn sec2" id="sReset" style="padding:4px 10px;font-size:14px">Reiniciar</button></p>
+  </div>
+ </div>
+</div>
+<canvas id="graf" width="1000" height="220"></canvas>
+<div class="tarjeta"><b>Para pensar:</b> acercá mucho los dos valores (por ejemplo 50 % y 52 %) con la esférica abierta a la mitad. ¿Qué le pasa al contador de cambios? ¿Qué le pasaría a un servo o a una bomba de verdad si trabajara así todo el día?</div>
+</section>
+
+<!-- ======================= 4 · CARGAR ======================= -->
+<section class="sec" id="cargar">
+<h1>Cargar el programa en el ESP32</h1>
+<p class="sub">Para el que quiere ver el programa por dentro.</p>
+<div class="ok"><b>El ESP32 de la planta lo carga el profe.</b> Es uno solo y ya va con el programa puesto. Esta parte es para el que tiene compu y quiere probarlo o cambiar algo.</div>
+<div class="tarjeta">
+<h2>Cargarlo con Arduino IDE <span class="cuenta">(5 pasos)</span></h2>
+<ol class="pasos">
+<li>Bajá el programa: <a class="btn sec2" href="planta/planta_nivel.ino" download>planta_nivel.ino</a></li>
+<li>En Arduino IDE: <b>Herramientas → Placa → Gestor de placas</b>, buscá <b>esp32</b> (de Espressif Systems) e instalalo.</li>
+<li><b>Herramientas → Gestionar bibliotecas</b>, buscá <b>ESP32Servo</b> (de Kevin Harrington) e instalala.</li>
+<li>Abrí el archivo, elegí la placa <b>ESP32 Dev Module</b> y el puerto COM que aparece.</li>
+<li>Apretá la flechita de subir y esperá a que diga «Done uploading».</li>
+</ol>
+</div>
+<div class="tarjeta">
+<h2>Para practicar sin placa: Wokwi</h2>
+<p>Wokwi es un simulador en internet, como Tinkercad, pero tiene ESP32. El profe les pasa el enlace del proyecto armado: ahí mueven la distancia del sensor con el mouse y ven cómo se mueve el servo. En el simulador no hay WiFi, así que se mira por el Monitor Serie.</p>
+</div>
+</section>
+
+<!-- ======================= 5 · CELULAR ======================= -->
+<section class="sec" id="celular">
+<h1>Manejar la planta con el celular</h1>
+<p class="sub">El ESP32 arma su propia red WiFi. No hace falta internet.</p>
+<div class="g2">
+<div class="tarjeta">
+<h2>Conectarse <span class="cuenta">(4 pasos)</span></h2>
+<ol class="pasos">
+<li>Enchufá el ESP32. Para usar la planta conviene un cargador de celular de 5 V y 1 A o más: así al servo le sobra corriente.</li>
+<li>En el celular, WiFi → red <b>Planta-EI1</b>, clave <b>12345678</b>. Si avisa que no tiene internet, decile que se quede conectado igual.</li>
+<li>Abrí Chrome y escribí <b>192.168.4.1</b></li>
+<li>Listo: ves el nivel en vivo, la señal en mA y la pinza.</li>
+</ol>
+</div>
+<div class="tarjeta">
+<h2>Calibrar <span class="cuenta">(4 pasos)</span></h2>
+<ol class="pasos">
+<li>Con el tanque <b>vacío</b>, tocá «Tomar como VACÍO».</li>
+<li>Llenalo hasta donde querés que sea el 100 % y tocá «Tomar como LLENO».</li>
+<li>Pinza: escribí un ángulo, tocá «Probar ángulo» y buscá el que corta del todo y el que deja pasar. Guardalos.</li>
+<li>Elegí los dos niveles del control (por ejemplo 30 % y 80 %) y guardalos.</li>
+</ol>
+<div class="ok">Todo queda guardado en el ESP32, aunque se desenchufe.</div>
+</div>
+</div>
+<div class="aviso"><b>Si el ESP32 se reinicia cuando se mueve el servo</b>, le falta corriente: cambiá el USB de la compu por un cargador de celular.</div>
+<div class="aviso"><b>El agua y la placa, lejos.</b> El ESP32 y el protoboard van en una bandeja seca, nunca debajo del tanque.</div>
+</section>
+
+<!-- ======================= 6 · GRUPOS ======================= -->
+<section class="sec" id="grupos">
+<h1>Qué hace cada grupo</h1>
+<p class="sub">Los cuatro grupos arman una sola planta. Cada uno se encarga de una parte y entrega su tabla de mediciones.</p>
+<div class="g4">
+<div class="tarjeta"><h2 style="color:var(--amb)">Proyecto 1 · Control y celular</h2>
+<ul><li>Cargar el programa y conectar el celular.</li><li>Con la planta en automático y la esférica abierta, anotar el nivel cada 10 segundos durante 3 minutos.</li><li>Hacer el gráfico y marcar dónde abre y dónde cierra la pinza.</li></ul>
+<b>Tabla:</b> tiempo · nivel · estado de la pinza.</div>
+<div class="tarjeta"><h2 style="color:var(--cel)">Proyecto 2 · El sensor</h2>
+<ul><li>Montar el sensor en la tapa, bien derecho hacia abajo.</li><li>Calibrar vacío y lleno desde el celular.</li><li>Llenar de a poco: en cada paso, nivel con regla y nivel del sensor. Mínimo cinco puntos.</li></ul>
+<b>Tabla:</b> nivel real · nivel medido · error.</div>
+<div class="tarjeta"><h2 style="color:#f97316">Proyecto 3 · Tanque y esférica</h2>
+<ul><li>Armar el tanque con la botella y la esférica a la salida, con un tramo de manguera.</li><li>Abrir la esférica del todo y medir cuánto tarda en salir 100 ml. Repetir cinco veces.</li><li>Calcular el caudal de salida.</li></ul>
+<b>Tabla:</b> volumen · tiempo · caudal.</div>
+<div class="tarjeta"><h2 style="color:var(--ve)">Proyecto 4 · La pinza</h2>
+<ul><li>Montar el servo y buscar el ángulo que corta y el que deja pasar.</li><li>Dosificar 2, 4, 6, 8 y 10 segundos y medir con jeringa cuánto salió.</li><li>Medir cuánto sigue goteando después de cortar.</li></ul>
+<b>Tabla:</b> tiempo · volumen · caudal.</div>
+</div>
+<div class="tarjeta"><h2>Calendario</h2>
+<table class="t"><tr><th>Fecha</th><th>Qué pasa</th></tr>
+<tr><td>Martes 27/10</td><td>Presentación, parejas y elección de temas. Conexiones y primer encendido.</td></tr>
+<tr><td>Martes 3/11</td><td>Calibración y tablas. Exponen dos parejas.</td></tr>
+<tr><td>Martes 10/11</td><td>Planta funcionando completa. Exponen las otras dos parejas.</td></tr>
+<tr><td>Martes 17/11</td><td>Evaluación.</td></tr></table></div>
+</section>
+
+<!-- ======================= 7 · EXPOSICIONES ======================= -->
+<section class="sec" id="exposiciones">
+<h1>Exposiciones orales</h1>
+<p class="sub">Cada pareja elige un tema y lo defiende frente al curso. Hay ocho temas y no se repiten: el orden para elegir sale por sorteo.</p>
+<div class="tarjeta"><h2>Cómo es</h2>
+<ul><li><b>8 minutos</b> de exposición: hablan los dos, mitad cada uno.</li><li>Después, <b>4 minutos de preguntas</b>. Cada integrante contesta solo al menos dos.</li><li>Nada de texto para leer: afiche o diapositivas con figuras. Suma mostrarlo en la planta.</li><li>Exponen dos parejas el <b>3/11</b> y dos el <b>10/11</b>. La evaluación es el <b>17/11</b>.</li></ul>
+<table class="t"><tr><th>Qué se mira</th><th>Puntos</th></tr>
+<tr><td>Dominio del tema: lo explican sin leer y con sus palabras</td><td>4</td></tr>
+<tr><td>Relación con la planta: lo muestran en lo que armamos</td><td>2</td></tr>
+<tr><td>Respuestas a las preguntas (nota individual)</td><td>3</td></tr>
+<tr><td>Claridad y tiempo</td><td>1</td></tr></table></div>
+<div class="g2">
+<div class="tarjeta"><h2>📏 1 · Medición de nivel</h2><p class="sub" style="margin:0 0 6px">ultrasonido, flotante, presión y radar</p><b>Tienen que poder contestar:</b><ul><li>¿Por qué en d = v·t/2 se divide por dos?</li><li>¿Qué ventaja tiene medir sin tocar el líquido?</li><li>¿Qué pasa si el tanque tiene espuma?</li></ul></div>
+<div class="tarjeta"><h2>🚰 2 · Válvulas</h2><p class="sub" style="margin:0 0 6px">esférica, globo, mariposa y pinza</p><b>Tienen que poder contestar:</b><ul><li>¿Dónde conviene una válvula de pinza?</li><li>¿Por qué una esférica no sirve para regular?</li><li>¿Qué válvula usarían para regular de a poco?</li></ul></div>
+<div class="tarjeta"><h2>⚙️ 3 · Actuadores</h2><p class="sub" style="margin:0 0 6px">servo, neumático y eléctrico</p><b>Tienen que poder contestar:</b><ul><li>¿Qué tiene adentro un servo?</li><li>¿Qué pasa si se corta la luz con la pinza abierta?</li><li>Neumático o eléctrico: ¿cuándo conviene cada uno?</li></ul></div>
+<div class="tarjeta"><h2>🔁 4 · Lazo abierto y cerrado</h2><p class="sub" style="margin:0 0 6px">el diagrama de bloques de la planta</p><b>Tienen que poder contestar:</b><ul><li>Dosificar 2 segundos, ¿es lazo abierto o cerrado?</li><li>Dibujen el diagrama de bloques de la planta.</li><li>Den un ejemplo de cada lazo en su casa.</li></ul></div>
+<div class="tarjeta"><h2>🎚️ 5 · Control todo-nada</h2><p class="sub" style="margin:0 0 6px">la histéresis y para qué sirve</p><b>Tienen que poder contestar:</b><ul><li>¿Qué es la histéresis en nuestra planta?</li><li>¿Qué pasa si los dos niveles son casi iguales?</li><li>¿Dónde hay un control todo-nada en su casa?</li></ul></div>
+<div class="tarjeta"><h2>🧠 6 · Control PID</h2><p class="sub" style="margin:0 0 6px">qué hacen la P, la I y la D</p><b>Tienen que poder contestar:</b><ul><li>¿Qué significan la P, la I y la D?</li><li>¿Por qué un PID mantendría el nivel más quieto?</li><li>¿Podría nuestra planta usar PID?</li></ul></div>
+<div class="tarjeta"><h2>📡 7 · Señal de 4 a 20 mA</h2><p class="sub" style="margin:0 0 6px">transmisores y el cero vivo</p><b>Tienen que poder contestar:</b><ul><li>¿Cuántos mA da el tanque al 50 %?</li><li>¿Por qué arranca en 4 mA y no en 0?</li><li>¿Por qué se manda corriente y no tensión?</li></ul></div>
+<div class="tarjeta"><h2>🌡️ 8 · Sensores de temperatura</h2><p class="sub" style="margin:0 0 6px">termocupla, RTD y NTC</p><b>Tienen que poder contestar:</b><ul><li>¿Cómo funciona una termocupla?</li><li>¿En qué se diferencian una RTD y un NTC?</li><li>¿Cuál usarían para un horno de 800 °C?</li></ul></div>
+</div>
+</section>
+</main>
+<div id="tooltipPin"></div>
+
+<script>
+// ---------------- pestañas ----------------
+const secciones=[...document.querySelectorAll('section.sec')];
+function irA(id){
+  secciones.forEach(s=>s.classList.toggle('on',s.id===id));
+  document.querySelectorAll('#pestanas button').forEach(b=>b.classList.toggle('on',b.dataset.s===id));
+  if(id!=='video') pararVideo();
+  window.scrollTo({top:0,behavior:'smooth'});
+  try{localStorage.setItem('ei1_seccion',id);}catch(e){}
+}
+document.querySelectorAll('#pestanas button').forEach(b=>b.onclick=()=>irA(b.dataset.s));
+try{const s=localStorage.getItem('ei1_seccion');if(s&&document.getElementById(s))irA(s);}catch(e){}
+
+// ---------------- video con voz ----------------
+const ESCENAS=[
+ 'Hoy vamos a armar una planta de nivel, como la que controla un tanque de agua en una fábrica, pero sobre la mesa y con un solo ESP32.',
+ 'Todo lazo de control tiene cuatro partes. El sensor mide. El controlador compara y decide. La válvula actúa. Y el proceso, que es el tanque, responde. Después el sensor vuelve a medir: eso es la realimentación.',
+ 'El sensor de ultrasonido manda un pulso de sonido que no escuchamos, espera el eco y mide cuánto tardó. Como el sonido va y vuelve, la distancia es la velocidad por el tiempo, dividido dos.',
+ 'La válvula de pinza no toca el agua. Un servo aprieta la manguera y corta el paso, o la suelta y deja pasar. Por eso se usa donde nada se puede contaminar.',
+ 'El ESP32 hace control todo-nada con histéresis. Cuando el nivel baja del treinta por ciento abre la pinza, y recién la cierra al llegar al ochenta. Esa franja evita que la válvula prenda y apague sin parar.',
+ 'Cuando alguien abre la válvula esférica, el tanque se vacía. El sensor lo nota, el ESP32 abre la pinza y la planta se rellena sola. Eso es controlar.',
+ 'Cada grupo se encarga de una parte: el sensor, la pinza, el tanque con la esférica, y el control con el celular. Además, cada pareja defiende un tema frente al curso. Ahora, a conectar cable por cable.'
+];
+let vIdx=0,vPlay=false,vTimer=null,vozES=null;
+const subt=document.getElementById('subt'),puntos=document.getElementById('puntos');
+ESCENAS.forEach((_,i)=>{const d=document.createElement('i');d.onclick=()=>{mostrarEscena(i);if(vPlay)hablar(i);};puntos.appendChild(d);});
+function elegirVoz(){
+  if(!('speechSynthesis' in window))return;
+  const vs=speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.toLowerCase().startsWith('es'));
+  const pref=['es-ar','es-419','es-us','es-mx','es-es'];
+  vozES=null;for(const p of pref){vozES=vs.find(v=>v.lang.toLowerCase()===p);if(vozES)break;}
+  if(!vozES)vozES=vs[0]||null;
+}
+if('speechSynthesis' in window){elegirVoz();speechSynthesis.onvoiceschanged=elegirVoz;}
+function mostrarEscena(i){
+  vIdx=i;
+  document.querySelectorAll('#esc .esc').forEach((g,k)=>{g.classList.remove('on','run');if(k===i){g.classList.add('on');void g.getBBox();g.classList.add('run');}});
+  [...puntos.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+  subt.textContent=ESCENAS[i];
+}
+function hablar(i){
+  clearTimeout(vTimer);
+  const siguiente=()=>{if(!vPlay)return;if(i<ESCENAS.length-1){mostrarEscena(i+1);hablar(i+1);}else{vPlay=false;document.getElementById('vPlay').textContent='▶ Reproducir';}};
+  const palabras=ESCENAS[i].split(/\s+/).length;
+  if('speechSynthesis' in window && vozES){
+    speechSynthesis.cancel();
+    const frases=ESCENAS[i].match(/[^.]+\.?/g).map(s=>s.trim()).filter(Boolean);
+    let k=0,terminado=false;
+    const respaldo=setTimeout(()=>{if(!terminado){terminado=true;siguiente();}},palabras*520+4000);
+    const decir=()=>{
+      if(!vPlay||vIdx!==i)return;
+      if(k>=frases.length){terminado=true;clearTimeout(respaldo);vTimer=setTimeout(siguiente,900);return;}
+      const u=new SpeechSynthesisUtterance(frases[k++]);u.voice=vozES;u.lang=vozES.lang;u.rate=1;
+      u.onend=decir;u.onerror=decir;speechSynthesis.speak(u);
+    };
+    decir();
+  }else{
+    vTimer=setTimeout(siguiente,Math.max(6000,palabras*430));
+  }
+}
+function pararVideo(){vPlay=false;clearTimeout(vTimer);if('speechSynthesis' in window)speechSynthesis.cancel();const b=document.getElementById('vPlay');if(b)b.textContent='▶ Reproducir';}
+document.getElementById('vPlay').onclick=()=>{
+  if(vPlay){pararVideo();return;}
+  vPlay=true;document.getElementById('vPlay').textContent='⏸ Pausa';
+  if(vIdx>=ESCENAS.length-1&&subt.textContent===ESCENAS[ESCENAS.length-1])vIdx=0;
+  mostrarEscena(vIdx);hablar(vIdx);
+};
+document.getElementById('vAnt').onclick=()=>{const i=Math.max(0,vIdx-1);mostrarEscena(i);if(vPlay)hablar(i);};
+document.getElementById('vSig').onclick=()=>{const i=Math.min(ESCENAS.length-1,vIdx+1);mostrarEscena(i);if(vPlay)hablar(i);};
+mostrarEscena(0);subt.textContent='Tocá «Reproducir» para empezar.';
+
+// ---------------- conexiones ----------------
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,padre){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(padre)padre.appendChild(e);return e;}
+const IZQ=['EN','VP','VN','D34','D35','D32','D33','D25','D26','D27','D14','D12','D13','GND','VIN'];
+const DER=['D23','D22','TX0','RX0','D21','D19','D18','D5','TX2','RX2','D4','D2','D15','GND','3V3'];
+const INFO_PIN={VIN:'VIN: 5 V que vienen del USB. De acá sale la alimentación del protoboard.',GND:'GND: masa, el 0 V de todo el circuito.',D5:'D5 (GPIO 5): sale la orden TRIG para el sensor.',D18:'D18 (GPIO 18): entra el eco del sensor, ya bajado a 3,3 V.',D27:'D27 (GPIO 27): sale la orden de posición para el servo.','3V3':'3V3: salida de 3,3 V. Hoy no la usamos.',EN:'EN: reinicia el ESP32.',TX0:'TX0: lo usa el USB. No conectar.',RX0:'RX0: lo usa el USB. No conectar.'};
+const PIN={};
+const gEsp=document.getElementById('pinesEsp');
+function pinEsp(nombre,x,y,lado){
+  const g=el('g',{class:'pin','data-pin':nombre},gEsp);
+  el('rect',{x:x-6,y:y-6,width:12,height:12,rx:2,fill:'#d4af37',stroke:'#7a5c00'},g);
+  el('text',{x:lado<0?x+12:x-12,y:y+4,'font-size':11,fill:'#e2e8f0','font-weight':700,'text-anchor':lado<0?'start':'end'},g).textContent=nombre;
+  const clave=(nombre==='GND')?('GND'+(lado<0?'i':'d')):nombre;PIN[clave]={x,y,g};
+  g.dataset.info=INFO_PIN[nombre]||(nombre+': pata libre, hoy no se usa.');
+}
+IZQ.forEach((n,i)=>pinEsp(n,410,150+24*i,-1));DER.forEach((n,i)=>pinEsp(n,560,150+24*i,1));
+const gHC=document.getElementById('pinesHC');
+[['VCC','VCC: alimentación de 5 V del sensor.'],['Trig','TRIG: entrada de la orden de medir.'],['Echo','ECHO: salida del eco, a 5 V. Necesita el divisor.'],['Gnd','GND: masa del sensor.']].forEach(([n,inf],i)=>{
+  const x=760+20*i;const g=el('g',{class:'pin'},gHC);g.dataset.info=inf;
+  el('rect',{x:x-3,y:150,width:6,height:22,fill:'#d4af37'},g);
+  el('text',{x:x,y:146,'font-size':10,fill:'#fff','text-anchor':'middle','font-weight':700,transform:`rotate(-90 ${x} 146)`},g).textContent=n;
+  PIN['HC_'+n]={x,y:172,g};
+});
+const gSv=document.getElementById('pinesServo');
+[['marron',268,'Cable marrón: masa (GND) del servo.'],['rojo',284,'Cable rojo: 5 V del servo.'],['naranja',300,'Cable naranja: señal de posición.']].forEach(([n,y,inf])=>{
+  const g=el('g',{class:'pin'},gSv);g.dataset.info=inf;el('circle',{cx:309,cy:y,r:5,fill:'#d4af37'},g);PIN['SV_'+n]={x:314,y,g};
+});
+// agujeros del protoboard
+const gAg=document.getElementById('agujeros');
+for(let x=665;x<=965;x+=20){el('circle',{cx:x,cy:560,r:3,fill:'#cbd5e1'},gAg);el('circle',{cx:x,cy:585,r:3,fill:'#cbd5e1'},gAg);}
+for(let x=665;x<=965;x+=20)for(let y=390;y<=510;y+=20)el('circle',{cx:x,cy:y,r:3,fill:'#dfe4ea'},gAg);
+// cables: [paso, color, d]
+const CABLES=[
+ [1,'#111111','M560,462 C610,462 640,585 665,585'],
+ [1,'#e11d48','M410,486 C370,486 360,560 430,560 L665,560'],
+ [2,'#e11d48','M760,172 C760,205 965,205 965,280 L965,560'],
+ [2,'#111111','M820,172 C820,220 945,220 945,300 L945,585'],
+ [3,'#16a34a','M780,172 C780,260 620,318 560,318'],
+ [4,'#eab308','M800,172 C800,300 720,330 720,430'],
+ [5,'#2563eb','M560,294 C680,294 800,330 800,470'],
+ [6,'#7c4a1e','M314,268 C360,268 360,462 410,462'],
+ [6,'#f59e0b','M314,300 C360,300 360,366 410,366'],
+ [6,'#dc2626','M314,284 C340,284 330,575 520,575 C600,575 620,560 685,560']
+];
+const gCab=document.getElementById('cables');const cabEls=[];
+CABLES.forEach(([p,c,d])=>{
+  const b=el('path',{d,class:'cable-borde'},gCab);const k=el('path',{d,class:'cable',stroke:c},gCab);
+  const L=k.getTotalLength();[b,k].forEach(e=>{e.style.strokeDasharray=L;e.style.strokeDashoffset=L;});
+  cabEls.push({p,b,k,L});
+});
+const PASOS=[
+ {t:'Las piezas',l:[],pins:[],x:'Sobre la mesa: el ESP32, el sensor HC-SR04, el servo de la pinza, un protoboard, tres resistencias y cables dupont. Todo desenchufado mientras se conecta.'},
+ {t:'La alimentación del protoboard',l:[['#111','GND del ESP32 → fila − del protoboard'],['#e11d48','VIN del ESP32 → fila + del protoboard']],pins:['GNDd','VIN'],x:'La fila + reparte los 5 V del USB y la fila − es la masa común. Así todos los aparatos comparten el mismo cero.'},
+ {t:'Alimentar el sensor',l:[['#e11d48','VCC del sensor → fila +'],['#111','GND del sensor → fila −']],pins:['HC_VCC','HC_Gnd'],x:'El HC-SR04 funciona con 5 V. Con 3,3 V no anda.'},
+ {t:'La orden de medir',l:[['#16a34a','TRIG del sensor → D5 del ESP32']],pins:['HC_Trig','D5'],x:'Por este cable el ESP32 le manda un pulso de 10 microsegundos: es la orden de «medí ahora».'},
+ {t:'El eco, primera mitad',l:[['#eab308','ECHO del sensor → resistencia de 1 kΩ']],pins:['HC_Echo'],comp:true,x:'El eco sale a 5 V y el ESP32 aguanta 3,3 V. Por eso no va directo: pasa primero por la resistencia de 1 kΩ.'},
+ {t:'El divisor y la pata D18',l:[['#2563eb','Unión de 1 kΩ y 2 kΩ → D18 del ESP32'],['#9ca3af','La de 2 kΩ va de esa unión a la fila −']],pins:['D18'],comp:true,x:'Las dos resistencias forman un divisor de tensión: 5 V · 2 / (1 + 2) = 3,3 V. Ese valor sí lo aguanta el ESP32.'},
+ {t:'El servo de la pinza',l:[['#7c4a1e','Marrón → GND del ESP32 (lado izquierdo)'],['#f59e0b','Naranja → D27 del ESP32'],['#dc2626','Rojo → fila + del protoboard']],pins:['GNDi','D27','SV_marron','SV_naranja','SV_rojo'],comp:true,x:'El naranja lleva la orden de posición. El marrón es la masa: si se olvidan de él, el servo tiembla o no se mueve.'},
+ {t:'Revisión antes de enchufar',l:[],pins:[],comp:true,x:'Chequeen con la tabla de abajo: ningún cable de + tocando uno de −. Recién ahí conecten el USB. Si algo calienta o huele raro, desenchufen enseguida.'}
+];
+let paso=0;
+function mostrarPaso(n){
+  paso=Math.max(0,Math.min(PASOS.length-1,n));
+  cabEls.forEach(c=>{const on=c.p<=paso;c.k.style.strokeDashoffset=on?0:c.L;c.b.style.strokeDashoffset=on?0:c.L;});
+  document.getElementById('resistencias').setAttribute('class',PASOS[paso].comp?'visible':'oculto');
+  document.querySelectorAll('#banco .pin').forEach(p=>p.classList.remove('brilla'));
+  PASOS[paso].pins.forEach(k=>PIN[k]&&PIN[k].g.classList.add('brilla'));
+  const P=PASOS[paso];
+  document.getElementById('infoPaso').innerHTML=`<h2>Paso ${paso+1} de ${PASOS.length} · ${P.t}</h2>`+
+    (P.l.length?`<ul class="lista">${P.l.map(([c,t])=>`<li><span class="punto" style="background:${c}"></span>${t}</li>`).join('')}</ul>`:'')+`<p>${P.x}</p>`;
+  document.getElementById('cuentaPaso').textContent=`Paso ${paso+1} de ${PASOS.length}`;
+  document.getElementById('cAnt').disabled=paso===0;document.getElementById('cSig').disabled=paso===PASOS.length-1;
+}
+document.getElementById('cAnt').onclick=()=>mostrarPaso(paso-1);
+document.getElementById('cSig').onclick=()=>mostrarPaso(paso+1);
+document.getElementById('cTodo').onclick=()=>mostrarPaso(PASOS.length-1);
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('conexiones').classList.contains('on'))return;
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();mostrarPaso(paso+1);}
+  if(e.key==='ArrowLeft'){e.preventDefault();mostrarPaso(paso-1);}
+});
+mostrarPaso(0);
+const tip=document.getElementById('tooltipPin');
+document.querySelectorAll('#banco .pin').forEach(p=>{
+  const mostrar=ev=>{const pt=ev.touches?ev.touches[0]:ev;tip.textContent=p.dataset.info;tip.style.display='block';tip.style.left=(pt.clientX+14)+'px';tip.style.top=(pt.clientY+14)+'px';};
+  p.addEventListener('mousemove',mostrar);p.addEventListener('mouseleave',()=>tip.style.display='none');
+  p.addEventListener('touchstart',ev=>{mostrar(ev);setTimeout(()=>tip.style.display='none',2500);},{passive:true});
+});
+
+// ---------------- simulador (misma lógica que el ESP32) ----------------
+const S={L:55,abierta:false,auto:true,esf:0,NB:30,NA:80,dosisHasta:0,cambios:0,t:0,hist:[]};
+const VACIO=25,LLENO=5;
+function moverPinzaSim(a){if(a!==S.abierta){S.abierta=a;S.cambios++;}}
+function controlarSim(nivel){
+  if(!S.auto||S.dosisHasta>0)return;
+  if(nivel<=S.NB&&!S.abierta)moverPinzaSim(true);
+  if(nivel>=S.NA&&S.abierta)moverPinzaSim(false);
+}
+const $=id=>document.getElementById(id);
+function botonesModo(){$('sAuto').className='btn'+(S.auto?'':' sec2');$('sManual').className='btn'+(S.auto?' sec2':'');}
+$('sAuto').onclick=()=>{S.auto=true;botonesModo();};
+$('sManual').onclick=()=>{S.auto=false;botonesModo();};
+$('sAbrir').onclick=()=>{S.auto=false;S.dosisHasta=0;moverPinzaSim(true);botonesModo();};
+$('sCerrar').onclick=()=>{S.auto=false;S.dosisHasta=0;moverPinzaSim(false);botonesModo();};
+$('sDosis').onclick=()=>{S.auto=false;moverPinzaSim(true);S.dosisHasta=S.t+2;botonesModo();};
+$('rEsf').oninput=e=>{S.esf=+e.target.value/100;$('vEsf').textContent=S.esf===0?'cerrada':Math.round(S.esf*100)+' % abierta';};
+function limites(){let b=+$('rNB').value,a=+$('rNA').value;if(b>=a){if(this===$('rNB'))b=a-1;else a=b+1;$('rNB').value=b;$('rNA').value=a;}S.NB=b;S.NA=a;$('vNB').textContent=b;$('vNA').textContent=a;}
+$('rNB').oninput=limites;$('rNA').oninput=limites;
+$('sReset').onclick=()=>{S.L=55;S.cambios=0;S.hist=[];S.t=0;S.dosisHasta=0;S.abierta=false;S.auto=true;$('rEsf').value=0;S.esf=0;$('vEsf').textContent='cerrada';botonesModo();};
+const cv=$('graf'),cx=cv.getContext('2d');
+function dibujarGraf(){
+  const W=cv.width,H=cv.height,m=34;cx.clearRect(0,0,W,H);
+  cx.fillStyle='#a9bdd6';cx.font='16px Nunito, sans-serif';cx.fillText('Nivel en los últimos 60 s',m+70,20);
+  const y=v=>H-14-(H-40)*v/100,x=t=>m+(W-m-10)*(t-(S.t-60))/60;
+  cx.strokeStyle='#334155';cx.lineWidth=1;cx.beginPath();cx.moveTo(m,y(0));cx.lineTo(W-10,y(0));cx.moveTo(m,y(100));cx.lineTo(W-10,y(100));cx.stroke();
+  S.hist.forEach((h,i)=>{if(i&&h.a){cx.fillStyle='rgba(52,211,153,.15)';const x0=x(S.hist[i-1].t);cx.fillRect(x0,y(100),x(h.t)-x0,y(0)-y(100));}});
+  cx.setLineDash([8,6]);cx.lineWidth=2;
+  cx.strokeStyle='#f87171';cx.beginPath();cx.moveTo(m,y(S.NA));cx.lineTo(W-10,y(S.NA));cx.stroke();
+  cx.strokeStyle='#34d399';cx.beginPath();cx.moveTo(m,y(S.NB));cx.lineTo(W-10,y(S.NB));cx.stroke();
+  cx.setLineDash([]);cx.strokeStyle='#38bdf8';cx.lineWidth=3;cx.beginPath();
+  S.hist.forEach((h,i)=>{const X=x(h.t),Y=y(h.n);i?cx.lineTo(X,Y):cx.moveTo(X,Y);});cx.stroke();
+  cx.fillStyle='#a9bdd6';cx.fillText('100 %',2,y(100)+5);cx.fillText('0 %',6,y(0));
+}
+function pasoSim(dt){
+  S.t+=dt;
+  if(S.dosisHasta>0&&S.t>=S.dosisHasta){S.dosisHasta=0;moverPinzaSim(false);}
+  const entra=S.abierta?7:0;                         // % por segundo con la pinza abierta
+  const sale=S.esf*6*Math.sqrt(Math.max(S.L,0)/100); // sale más rápido cuando está lleno
+  S.L=Math.min(100,Math.max(0,S.L+(entra-sale)*dt));
+  const d=VACIO-S.L/100*(VACIO-LLENO)+(Math.random()-.5)*0.25;   // lo que mide el sensor
+  const nivel=Math.min(100,Math.max(0,(VACIO-d)/(VACIO-LLENO)*100));
+  controlarSim(nivel);
+  S.hist.push({t:S.t,n:nivel,a:S.abierta});while(S.hist.length&&S.hist[0].t<S.t-60)S.hist.shift();
+  return {d,nivel};
+}
+let ultimo=performance.now(),acum=0,lect={d:0,nivel:0};
+function bucle(ahora){
+  const dt=Math.min(.2,(ahora-ultimo)/1000);ultimo=ahora;acum+=dt;
+  while(acum>=.05){lect=pasoSim(.05);acum-=.05;}
+  if(document.getElementById('simulador').classList.contains('on')){
+    $('lDist').textContent=lect.d.toFixed(1)+' cm';$('lNivel').textContent=Math.round(lect.nivel)+' %';
+    $('lMa').textContent=(4+16*lect.nivel/100).toFixed(1)+' mA';
+    $('lPinza').innerHTML=S.abierta?'<span class="chip ve">ABIERTA</span>':'<span class="chip ro">CERRADA</span>';
+    $('lCambios').textContent=S.cambios;
+    const alto=206*S.L/100;$('sAgua').setAttribute('y',356-alto);$('sAgua').setAttribute('height',alto);
+    $('sHaz').setAttribute('y2',356-alto);
+    $('sLineaA').setAttribute('y1',356-206*S.NA/100);$('sLineaA').setAttribute('y2',356-206*S.NA/100);
+    $('sLineaB').setAttribute('y1',356-206*S.NB/100);$('sLineaB').setAttribute('y2',356-206*S.NB/100);
+    $('sBrazo').setAttribute('height',S.abierta?14:22);$('sHose').setAttribute('height',S.abierta?12:4);$('sHose').setAttribute('y',S.abierta?114:118);
+    const gotas=$('sGotas');gotas.style.opacity=S.abierta?1:0;
+    [...gotas.children].forEach((c,i)=>c.setAttribute('cy',160+((ahora/6+i*25)%60)));
+    $('sManija').setAttribute('transform',`rotate(${90*S.esf} 445 340)`);
+    $('sChorro').setAttribute('opacity',S.esf>0&&S.L>0.5?1:0);$('sChorro').setAttribute('stroke-width',2+6*S.esf);
+    dibujarGraf();
+  }
+  requestAnimationFrame(bucle);
+}
+botonesModo();requestAnimationFrame(bucle);
+</script>
+</body>
+</html>
