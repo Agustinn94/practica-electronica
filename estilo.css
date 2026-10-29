@@ -121,3 +121,68 @@ header.barra{display:block}
 .encab table.datos{width:100%;border-collapse:collapse;font-size:15px}.encab table.datos td{padding:4px 6px;border-top:1px solid var(--borde)}
 textarea.txt{width:100%;font:inherit;font-size:17px;padding:12px 14px;border-radius:12px;border:2px solid var(--borde);background:#0a1624;color:var(--tinta);resize:vertical;min-height:110px}
 @media print{.fig{border:1px solid #999}}
+/* fotos de las cuentas */
+.foto-zona{margin:12px 0;padding:12px;border:2px dashed var(--amb);border-radius:14px;background:rgba(255,176,32,.07)}
+.foto-txt{font-size:15px;margin-bottom:10px;line-height:1.45}
+.foto-fila{display:flex;gap:12px;align-items:center}
+.foto-min{flex:0 0 74px;height:74px;border-radius:10px;background:#0a1624;border:1px solid var(--borde);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.foto-min img{width:100%;height:100%;object-fit:cover}
+.foto-ok{font-size:22px}
+.resp input:disabled{opacity:.45}
+/* ---------- v2: figuras tipo libro, LaTeX y resolución paso a paso ---------- */
+.fig{background:#fbfaf6;border-radius:14px;padding:8px;text-align:center;margin:10px 0;overflow-x:auto}
+.fig svg.figura{max-width:100%;height:auto;display:inline-block}
+.enun .katex,.op .katex{font-size:1.05em}
+.resol{margin-top:10px;display:grid;gap:8px}
+.paso-r{display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.04);border:1px solid var(--borde);border-radius:12px;padding:10px 12px;line-height:1.5}
+.paso-r .pn{flex:0 0 28px;height:28px;border-radius:50%;background:var(--az);color:#06182e;font-weight:900;display:flex;align-items:center;justify-content:center}
+.paso-r .sep{color:var(--suave)}
+.fx-caja,.res-caja{background:#fff7e0;color:#2a1a00;border:2px solid var(--amb);border-radius:10px;padding:2px 10px;margin:6px 0;overflow-x:auto}
+.res-caja{background:#e3fbef;border-color:var(--ve);color:#052e1c}
+.porque{font-size:15px;color:var(--suave);margin-top:4px}
+.formulas .fx{font-family:inherit;font-size:18px;background:#fff7e0;color:#2a1a00;border:2px solid var(--amb);border-radius:10px;padding:6px 12px;display:inline-block;max-width:100%;overflow-x:auto}
+.fx .katex{color:#2a1a00}
+.aviso.ve{border-color:var(--ve);background:rgba(52,211,153,.12)}
+.aviso.amb{border-color:var(--amb);background:rgba(255,176,32,.14)}
+.grande-aviso{font-size:18px;line-height:1.45}
+details{margin-top:8px}details summary{cursor:pointer;font-weight:800;color:var(--amb)}
+.herram{margin:6px 0 4px}.herram .btn{padding:8px 12px;font-size:16px}
+/* tapa la pantalla apenas la página pierde el foco */
+body.tapado #app,body.tapado header{filter:blur(18px) brightness(.45);pointer-events:none}
+body.tp-activo{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.tp-activo textarea,body.tp-activo input{-webkit-user-select:text;user-select:text}
+/* calculadora */
+#modal .caja.calc{max-width:380px;width:100%}
+.calc .pant{background:#0a1624;border-radius:12px;padding:10px 14px;text-align:right;margin-bottom:10px}
+.calc #c-ex{color:var(--suave);min-height:22px;font-size:17px;word-break:break-all}
+.calc #c-res{font-size:30px;font-weight:900}
+.calc .teclas{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.calc .teclas button{font:inherit;font-weight:800;font-size:19px;padding:12px 0;border-radius:10px;border:1px solid var(--borde);background:var(--panel2);color:var(--tinta)}
+.calc .teclas button.nu{background:#24476e}.calc .teclas button.ig{background:var(--amb);color:#1b1200}
+#modal .caja.hoja{max-width:720px;width:100%;max-height:86vh;overflow:auto}
+.hoja-sec{margin:10px 0}
+.tabla-r{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px}.tabla-r td,.tabla-r th{border:1px solid var(--borde);padding:6px 8px;text-align:left}.tabla-r th{background:var(--panel2)}
+.paso-r>div{min-width:0;flex:1}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0;margin:.4em 0}
+.enun,.op span{min-width:0;overflow-wrap:anywhere}
+.resol{grid-template-columns:minmax(0,1fr)}
+.tarjeta{min-width:0}
+.tarjeta .tarjeta{padding:12px}
+@media (max-width:480px){.tarjeta{padding:14px}.paso-r{padding:8px 10px}}
+/* simuladores del repaso */
+.sim{background:#0f2238;border:2px solid var(--cel);border-radius:14px;padding:12px 14px;margin:12px 0}
+.sim-t{font-weight:900;color:var(--cel);margin-bottom:6px}
+.sim-r{display:block;margin:8px 0}.sim-r span{display:block;font-size:16px}.sim-r input{width:100%;accent-color:var(--amb);height:28px}
+.sim-res{background:rgba(255,255,255,.05);border-radius:10px;padding:8px 10px;margin-top:6px;line-height:1.5}
+.sim-res .ok{color:var(--ve)}.sim-res .no{color:var(--ro)}
+.sim-dato{font-size:14px;color:var(--suave);margin:4px 0}
+.sim-g{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:10px;align-items:center}
+.sim-lamp{width:92px;height:auto}
+.sim-c{width:100%;height:auto;background:#fbfaf6;border-radius:10px;margin-top:6px}
+.sim-bot{margin:6px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sim-bot button{font:inherit;font-weight:800;padding:6px 12px;border-radius:10px;border:2px solid var(--borde);background:var(--panel2);color:var(--tinta)}
+.sim-bot button.on{border-color:var(--amb);background:rgba(255,176,32,.2)}
+.sim-celdas{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.sim-celdas i{width:26px;height:26px;border-radius:4px;background:linear-gradient(135deg,#1b3a8a,#3b6fd8);border:1px solid #9cf}
+.foto-real{margin:10px 0;text-align:center}.foto-real img{max-width:100%;max-height:300px;border-radius:12px;border:1px solid var(--borde)}
+.foto-real figcaption{font-size:14px;color:var(--suave);margin-top:4px}
+.creditos{font-size:12px;color:var(--suave);line-height:1.4}

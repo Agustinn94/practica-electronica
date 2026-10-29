@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="es" class="app">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Repaso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="katex/katex.min.css">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .indice { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px }
+  .indice a { text-decoration: none }
+  .sec { scroll-margin-top: 80px }
+  .sec h2 { margin: 0 0 8px; font-size: 26px }
+  .sec ul { padding-left: 20px; line-height: 1.55; font-size: 18px }
+  .sec li { margin: 6px 0 }
+  .sec .formulas { justify-content: flex-start }
+  .ejemplo { border-left: 5px solid var(--ve) }
+  .ejemplo h3 { margin: 0 0 6px }
+  .barra-sec { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap }
+  /* modo proyectar: una pantalla por vez, letra grande */
+  #proy { position: fixed; inset: 0; background: var(--fondo); z-index: 30; display: none; flex-direction: column; padding: 2.2vh 4vw }
+  #proy.on { display: flex }
+  #proy .cab { display: flex; justify-content: space-between; align-items: center; color: var(--suave); font-weight: 800; font-size: 2vh }
+  #proy .cuerpo { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 3vw; align-items: center; overflow: hidden }
+  #proy .cuerpo.solo { grid-template-columns: 1fr }
+  #proy h2 { font-size: 5vh; margin: 1vh 0 2vh }
+  #proy ul { font-size: 3.1vh; line-height: 1.45; padding-left: 3vh }
+  #proy li { margin: 1.2vh 0 }
+  #proy .fig { max-height: 62vh; display: flex; align-items: center; justify-content: center }
+  #proy .fig svg.figura { max-height: 58vh; width: auto; max-width: 100% }
+  #proy .formulas .fx { font-size: 3.4vh; padding: 1vh 2vh }
+  #proy .resol { font-size: 2.6vh }
+  #proy .proy-sim { max-width: 1100px; margin: 0 auto; width: 100%; font-size: 2.6vh }
+  #proy .proy-sim .sim-r span { font-size: 2.6vh } #proy .proy-sim .sim-lamp { width: 16vh } #proy .sim-g { grid-template-columns: minmax(0,1fr) 18vh }
+  #proy .foto-real img { max-height: 62vh }
+  #proy .pie2 { text-align: center; color: var(--suave); font-size: 1.8vh }
+  @media (max-aspect-ratio: 1/1) { #proy .cuerpo { grid-template-columns: 1fr } }
+</style>
+</head>
+<body>
+<header class="barra"><div class="barra-in"><img src="logo.jpg" alt="IAT"><div class="t" id="curso">Repaso</div><div class="der"><a href="#" id="volver" class="chip">← Volver</a></div></div></header>
+<main class="envoltura" id="app"><p>Cargando…</p></main>
+<div id="proy"></div>
+<script src="katex/katex.min.js"></script>
+<script src="katex/contrib/auto-render.min.js"></script>
+<script src="figuras.js"></script>
+<script src="examen.js"></script>
+<script src="simuladores.js"></script>
+<script src="qrcode.js"></script>
+<script>
+(function () {
+  var c = (new URLSearchParams(location.search).get('c') || '').toLowerCase();
+  if (c !== 'e1' && c !== 'e2') { location.replace('index.html'); return; }
+  var s = document.createElement('script'); s.src = 'banco-' + c + '.js?v=2'; s.onload = arrancar; document.body.appendChild(s);
+
+  function arrancar() {
+    const B = window.BANCO, EX = window.EX, $ = (x) => document.querySelector(x);
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    document.title = 'Repaso · ' + B.nombre;
+    $('#curso').innerHTML = `${B.nombre}<small>${B.anio} · Repaso para estudiar</small>`;
+    $('#volver').href = 'alumno.html?c=' + B.curso;
+
+    // un ejemplo resuelto de cada tema, siempre con los mismos números
+    const ejemplo = (tema) => { const d = B.preguntas.find((p) => p.tema === tema && p.tipo === 'num'); return d ? EX.armar(d, EX.rng('repaso|' + tema)) : null; };
+    const tabla = (t) => `<table class="tabla-r"><tr>${t[0].map((x) => `<th>${x}</th>`).join('')}</tr>${t.slice(1).map((r) => `<tr>${r.map((x) => `<td>${x}</td>`).join('')}</tr>`).join('')}</table>`;
+    const formulas = (fx) => fx && fx.length ? `<div class="formulas">${fx.map((x) => `<span class="fx">$${x}$</span>`).join('')}</div>` : '';
+
+    // ---------- lectura en el celular ----------
+    const foto = (src, pie) => src ? `<figure class="foto-real"><img src="${src}" alt="${esc(pie || '')}" loading="lazy"><figcaption>📷 ${pie || ''}</figcaption></figure>` : '';
+    const sims = [];
+    const sim = (tema) => { if (!window.SIM || !SIM.tiene(tema)) return ''; const x = SIM.html(tema); sims.push([tema, x.p]); return x.html; };
+    const secs = B.repaso.map((s, k) => {
+      const ej = ejemplo(s.tema);
+      return `<section class="sec tarjeta" id="${encodeURIComponent(s.tema)}"><div class="barra-sec"><h2>${k + 1}. ${s.t}</h2><button class="btn sec" data-voz="${k}">🔊 Escuchar</button></div>
+        ${foto(s.foto, s.pie)}${s.fig ? `<div class="fig">${s.fig()}</div>` : ''}${s.fig2 ? `<div class="fig">${s.fig2()}</div>` : ''}${s.tabla ? tabla(s.tabla) : ''}
+        <ul>${s.items.map((i) => `<li>${i}</li>`).join('')}</ul>${foto(s.foto2, s.pie2)}${foto(s.foto3, s.pie3)}${sim(s.tema)}
+        ${s.fx && s.fx.length ? `<b>Fórmulas</b>${formulas(s.fx)}` : ''}
+        ${ej ? `<div class="tarjeta ejemplo"><h3>Ejemplo resuelto</h3>${ej.fig ? `<div class="fig">${ej.fig}</div>` : ''}<div class="enun">${ej.enun}</div>${EX.resolucionHTML(ej)}</div>` : ''}</section>`;
+    }).join('');
+    $('#app').innerHTML = `<h1>Repaso de ${B.nombre}</h1><p class="sub">Todo lo que se pregunta en la práctica y en los simulacros sale de acá. Leelo antes de empezar y volvé cuando tengas una duda.</p>
+      <div class="fila"><button class="btn" id="b-proy">📽️ Proyectar en clase</button><a class="btn sec" href="apunte-${B.curso}.pdf" target="_blank" rel="noopener">📄 PDF para imprimir</a></div>
+      <div class="indice">${B.repaso.map((s, k) => `<a class="chip" href="#${encodeURIComponent(s.tema)}">${k + 1}. ${s.t}</a>`).join('')}</div>
+      <div class="aviso"><b>Cómo se resuelve una cuenta, siempre igual:</b> 1) datos con su unidad · 2) qué piden · 3) fórmula · 4) reemplazo · 5) resultado con unidad.</div>
+      ${secs}<div class="fila"><a class="btn" href="alumno.html?c=${B.curso}">Ir a practicar →</a></div><p class="creditos" id="creditos"></p>`;
+    EX.mate($('#app'));
+    sims.forEach(([t, p]) => { try { SIM.init(t, p); } catch (e) { console.error(e); } });
+    fetch('fotos/creditos.json').then((r) => r.json()).then((c) => { const usadas = B.repaso.flatMap((s) => [s.foto, s.foto2, s.foto3]).filter(Boolean).map((x) => x.replace(/^fotos\/|\.jpg$/g, ''));
+      $('#creditos').innerHTML = 'Fotos: Wikimedia Commons. ' + usadas.filter((u) => c[u]).map((u) => `${esc(c[u].titulo)}, ${esc(c[u].autor || 'autor desconocido')} (${esc(c[u].licencia)})`).join(' · ') + '. Dibujos y simuladores: hechos para esta materia.'; }).catch(() => {});
+    if (location.hash) { const el = document.getElementById(location.hash.slice(1)); if (el) setTimeout(() => el.scrollIntoView(), 300); }
+
+    // ---------- escuchar: lee el texto en voz alta ----------
+    function hablar(html) {
+      let s = String(html);
+      s = s.replace(/\$([^$]+)\$/g, (m, t) => ' ' + tex(t) + ' ');
+      s = s.replace(/<sub>/g, ' ').replace(/<[^>]+>/g, '').replace(/&gt;/g, ' mayor que ').replace(/&lt;/g, ' menor que ');
+      return s.replace(/\s+/g, ' ').trim();
+    }
+    function tex(t) {
+      let s = t;
+      for (let i = 0; i < 3; i++) s = s.replace(/\\dfrac\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}/g, ' $1 dividido $2 ');
+      const R = [[/\\mathrm\{k\}\\Omega/g, ' kiloohms'], [/\\Omega/g, ' ohms'], [/\\mu\\mathrm\{A\}/g, ' microamperes'], [/\\mathrm\{mA\}/g, ' miliamperes'], [/\\mathrm\{ms\}/g, ' milisegundos'],
+        [/\\mathrm\{kHz\}/g, ' kilohertz'], [/\\mathrm\{MHz\}/g, ' megahertz'], [/\\mathrm\{Hz\}/g, ' hertz'], [/\\mathrm\{mV\}/g, ' milivolts'], [/\\mathrm\{V\}/g, ' volts'], [/\\mathrm\{A\}/g, ' amperes'],
+        [/\\mathrm\{mW\}/g, ' miliwatts'], [/\\mathrm\{W\}/g, ' watts'], [/\\mathrm\{dB\}/g, ' decibeles'], [/\^\\circ/g, ' grados'], [/\\%/g, ' por ciento'], [/\\cdot/g, ' por '], [/\\approx/g, ' aproximadamente '],
+        [/\\gg/g, ' mucho mayor que '], [/\\Rightarrow/g, ', entonces '], [/\\beta/g, ' beta '], [/\\alpha/g, ' alfa '], [/\\Delta/g, ' delta '], [/\\log/g, ' logaritmo de '], [/\\text\{([^}]*)\}/g, ' $1 '],
+        [/\\mathrm\{([^}]*)\}/g, '$1'], [/\{,\}/g, ' coma '], [/\^\{?\\,?2\}?/g, ' al cuadrado '], [/_\{?\(sat\)\}?/g, ' de saturación '], [/\(on\)/g, ' on '], [/_\{([^}]*)\}/g, ' $1 '], [/_(\w)/g, ' $1 '],
+        [/=/g, ' igual a '], [/>/g, ' mayor que '], [/</g, ' menor que '], [/-/g, ' menos '], [/\+/g, ' más '], [/\\[a-z]+/g, ' '], [/[{}\\]/g, ' ']];
+      R.forEach(([a, b]) => { s = s.replace(a, b); });
+      return s;
+    }
+    const tts = 'speechSynthesis' in window;
+    const voz = () => { const vs = tts ? speechSynthesis.getVoices() : []; return vs.find((x) => /es[-_]AR/i.test(x.lang)) || vs.find((x) => /es[-_](US|419|MX)/i.test(x.lang)) || vs.find((x) => /^es/i.test(x.lang)) || null; };
+    function leer(textos, boton) {
+      if (!tts) { alert('Este navegador no puede leer en voz alta.'); return; }
+      if (speechSynthesis.speaking) { speechSynthesis.cancel(); if (boton) boton.textContent = '🔊 Escuchar'; return; }
+      const v = voz(); let i = 0; if (boton) boton.textContent = '⏹ Parar';
+      const una = () => { if (i >= textos.length) { if (boton) boton.textContent = '🔊 Escuchar'; return; }
+        const u = new SpeechSynthesisUtterance(hablar(textos[i++])); u.lang = (v && v.lang) || 'es-AR'; if (v) u.voice = v; u.rate = 0.97; u.onend = una; u.onerror = () => { if (boton) boton.textContent = '🔊 Escuchar'; }; speechSynthesis.speak(u); };
+      una();
+    }
+    document.querySelectorAll('[data-voz]').forEach((b) => b.onclick = () => { const s = B.repaso[+b.dataset.voz]; leer([s.t].concat(s.items), b); });
+    window.__hablar = hablar;
+
+    // ---------- proyectar ----------
+    const diap = [];
+    diap.push({ solo: true, html: `<div style="text-align:center"><h2 style="font-size:7vh">Repaso de ${B.nombre}</h2><p style="font-size:3.4vh;color:var(--suave)">${B.repaso.map((s) => s.t).join(' · ')}</p><div style="display:flex;gap:3vw;align-items:center;justify-content:center;margin-top:2vh"><div style="background:#fff;border-radius:16px;padding:1.5vh">${(() => { try { const q = qrcode(0, 'M'); q.addData(location.href.replace(/repaso\.html.*$/, 'alumno.html?c=' + B.curso)); q.make(); return q.createSvgTag({ cellSize: 7, margin: 1 }); } catch (e) { return ''; } })()}</div><p style="font-size:3vh;text-align:left;max-width:50vw">Escaneá con la cámara del celular para entrar a la página.<br><span style="color:var(--suave);font-size:2.4vh;word-break:break-all">${location.href.replace(/repaso\.html.*$/, 'alumno.html?c=' + B.curso)}</span></p></div></div>` });
+    B.repaso.forEach((s, k) => {
+      diap.push({ cab: `${k + 1} de ${B.repaso.length} · ${s.t}`, izq: `<h2>${s.t}</h2><ul>${s.items.map((i) => `<li>${i}</li>`).join('')}</ul>`, der: s.fig ? `<div class="fig">${s.fig()}</div>` : (s.tabla ? tabla(s.tabla) : '') });
+      if (s.tabla && s.fig) diap.push({ cab: s.t, solo: true, html: `<h2>${s.t}</h2>${tabla(s.tabla)}` });
+      if (s.fx && s.fx.length) diap.push({ cab: `${s.t} · fórmulas`, izq: `<h2>Fórmulas</h2>${formulas(s.fx)}`, der: s.fig2 ? `<div class="fig">${s.fig2()}</div>` : (s.fig ? `<div class="fig">${s.fig()}</div>` : '') });
+      if (window.SIM && SIM.tiene(s.tema)) diap.push({ cab: `${s.t} · probalo`, solo: true, sim: s.tema });
+      if (s.foto) diap.push({ cab: `${s.t} · así es de verdad`, solo: true, html: `<h2>${s.t}: así es de verdad</h2>${foto(s.foto, s.pie).replace('max-height:300px', '')}` });
+      const ej = ejemplo(s.tema);
+      if (ej) diap.push({ cab: `${s.t} · ejemplo resuelto`, izq: `<h2>Ejemplo</h2><div style="font-size:3vh">${ej.enun}</div>${ej.fig ? `<div class="fig">${ej.fig}</div>` : ''}`, der: EX.resolucionHTML(ej) });
+    });
+    let k = 0;
+    function mostrar() {
+      const d = diap[k], p = $('#proy');
+      p.innerHTML = `<div class="cab"><span>${B.nombre} · ${d.cab || 'Repaso'}</span><span>${k + 1} / ${diap.length} · Esc para salir</span></div>
+        <div class="cuerpo ${d.solo ? 'solo' : ''}">${d.sim ? `<div class="proy-sim" id="proy-sim"></div>` : d.solo ? `<div>${d.html}</div>` : `<div>${d.izq}</div><div>${d.der}</div>`}</div><div class="pie2">espacio o → para avanzar · ← para volver</div>`;
+      if (d.sim) { const x = SIM.html(d.sim); $('#proy-sim').innerHTML = x.html; SIM.init(d.sim, x.p); }
+      EX.mate(p);
+    }
+    $('#b-proy').onclick = () => { $('#proy').classList.add('on'); k = 0; mostrar(); try { document.documentElement.requestFullscreen(); } catch (e) {} };
+    document.addEventListener('keydown', (e) => {
+      if (!$('#proy').classList.contains('on')) return;
+      if ([' ', 'ArrowRight', 'PageDown', 'Enter'].includes(e.key)) { e.preventDefault(); if (k < diap.length - 1) { k++; mostrar(); } }
+      else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); if (k > 0) { k--; mostrar(); } }
+      else if (e.key === 'Escape') { $('#proy').classList.remove('on'); try { document.exitFullscreen(); } catch (x) {} }
+    });
+    $('#proy').onclick = (e) => { if (e.target.closest('a,button,input,label,.sim')) return; if (e.clientX > innerWidth / 3) { if (k < diap.length - 1) { k++; mostrar(); } } else if (k > 0) { k--; mostrar(); } };
+  }
+})();
+</script>
+</body>
+</html>

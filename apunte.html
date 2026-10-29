@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Apunte</title>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  @font-face { font-family: 'Comic Neue'; src: url(fuentes/ComicNeue-400.ttf); font-weight: 400 }
+  @font-face { font-family: 'Comic Neue'; src: url(fuentes/ComicNeue-700.ttf); font-weight: 700 }
+  @page { size: A4; margin: 14mm 13mm 14mm 13mm }
+  * { box-sizing: border-box }
+  body { font-family: 'Comic Sans MS', 'Comic Neue', cursive; color: #111; background: #fff; margin: 0; font-size: 11.5pt; line-height: 1.38 }
+  .hoja { max-width: 190mm; margin: 0 auto }
+  .enc { display: flex; gap: 12px; align-items: center; border-bottom: 2.5px solid #1f3a5f; padding-bottom: 6px; margin-bottom: 8px }
+  .enc img { width: 54px; height: 54px; object-fit: contain }
+  .enc .t { flex: 1 } .enc .t b { font-size: 15pt; display: block; color: #1f3a5f } .enc .t span { font-size: 10pt; color: #444 }
+  h1 { font-size: 19pt; margin: 6px 0 4px; color: #1f3a5f }
+  h2 { font-size: 15pt; margin: 0 0 4px; color: #1f3a5f; border-bottom: 1.5px solid #c9d6e8; padding-bottom: 2px }
+  h3 { font-size: 12pt; margin: 6px 0 3px }
+  h2, h3 { break-after: avoid } .tema > h2 + .fila2 { break-before: avoid }
+  .caja { border: 1.6px solid #1f3a5f; border-radius: 8px; padding: 7px 10px; margin: 7px 0; background: #f4f7fc }
+  .caja.amb { border-color: #d48806; background: #fff8e6 }
+  .tema { break-inside: auto; margin: 10px 0 12px }
+  .fila2 { display: grid; grid-template-columns: 1.05fr 1fr; gap: 10px; align-items: start }
+  .fig { text-align: center; break-inside: avoid } .fig svg.figura { max-width: 100%; height: auto; max-height: 62mm }
+  ul { margin: 4px 0; padding-left: 18px } li { margin: 2px 0 }
+  .fxs { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 5px 0 } .fx { border: 1.6px solid #d48806; background: #fff8e6; border-radius: 7px; padding: 2px 8px; break-inside: avoid }
+  .ej { border-left: 4px solid #1a9c62; background: #f2fbf6; padding: 6px 10px; border-radius: 0 8px 8px 0; margin-top: 6px; break-inside: avoid; display: grid; grid-template-columns: minmax(0,1fr) 58mm; gap: 8px; align-items: center }
+  .ej .fig svg.figura { max-height: 52mm }
+  .ej .pasos { margin: 4px 0 0; padding-left: 0; list-style: none; counter-reset: p }
+  .ej .pasos li { counter-increment: p; margin: 2px 0; display: flex; gap: 6px; align-items: baseline } .ej .pasos li::before { content: counter(p); font-weight: 700; background: #1a9c62; color: #fff; border-radius: 50%; min-width: 17px; height: 17px; font-size: 9pt; display: inline-flex; align-items: center; justify-content: center }
+  .ej .katex-display { margin: 2px 0; text-align: left } .ej .katex-display > .katex { text-align: left }
+  table { border-collapse: collapse; width: 100%; font-size: 10pt; margin: 4px 0 } td, th { border: 1px solid #9fb2cc; padding: 3px 6px; text-align: left } th { background: #e8eef7 }
+  .salto { break-before: page }
+  .resumen-fx { columns: 2; column-gap: 14px } .resumen-fx .g { break-inside: avoid; margin: 0 0 8px; border: 1.4px solid #1f3a5f; border-radius: 8px; padding: 5px 8px }
+  .resumen-fx .g b { color: #1f3a5f } .resumen-fx .katex { font-size: 1.05em }
+  .resumen-fx .g div { margin: 3px 0 }
+  .pie { font-size: 9pt; color: #555; text-align: center; margin-top: 6px }
+  figure.foto { margin: 4px auto; text-align: center; break-inside: avoid } figure.foto img { max-width: 62mm; max-height: 38mm; border-radius: 6px; border: 1px solid #ccc } figure.foto figcaption { font-size: 8.5pt; color: #555 }
+  .cred { font-size: 7.5pt; color: #666; margin-top: 6px }
+  @media screen { body { background: #e5e7eb } .hoja { background: #fff; padding: 14mm; margin: 10px auto; box-shadow: 0 4px 20px rgba(0,0,0,.15) } }
+</style>
+</head>
+<body>
+<div class="hoja" id="doc">Cargando…</div>
+<script src="katex/katex.min.js"></script>
+<script src="katex/contrib/auto-render.min.js"></script>
+<script src="figuras.js"></script>
+<script src="examen.js"></script>
+<script>
+(function () {
+  var c = (new URLSearchParams(location.search).get('c') || '').toLowerCase();
+  if (c !== 'e1' && c !== 'e2') c = 'e2';
+  var s = document.createElement('script'); s.src = 'banco-' + c + '.js?v=2'; s.onload = armar; document.body.appendChild(s);
+  function armar() {
+    const B = window.BANCO, EX = window.EX;
+    document.title = 'Apunte y hoja de fórmulas · ' + B.nombre;
+    const tabla = (t) => `<table><tr>${t[0].map((x) => `<th>${x}</th>`).join('')}</tr>${t.slice(1).map((r) => `<tr>${r.map((x) => `<td>${x}</td>`).join('')}</tr>`).join('')}</table>`;
+    const ejemplo = (tema) => { const d = B.preguntas.find((p) => p.tema === tema && p.tipo === 'num'); return d ? EX.armar(d, EX.rng('repaso|' + tema)) : null; };
+    const pasosEj = (p) => {
+      const L = [];
+      L.push(`<b>Datos:</b> ${p.datos.map((d) => `$${d}$`).join(' · ')}`);
+      L.push(`<b>Piden:</b> ${p.pide}`);
+      L.push(`<b>Fórmula:</b> $${p.formula}$`);
+      (p.cuentas || []).forEach((c) => L.push(`<b>${c[0]}:</b> ${c[1].map((x) => `$${x}$`).join(' ')}`));
+      L.push(`<b>Resultado:</b> $\\boxed{${p.resultado}}$`);
+      return `<ul class="pasos">${L.map((l) => `<li><span>${l}</span></li>`).join('')}</ul>`;
+    };
+    const intro = B.curso === 'e2'
+      ? 'Este apunte junta lo que vimos desde la clase del MOSFET hasta la del TRIAC. Sirve para estudiar para los simulacros y para el examen: cada consigna que se pregunta sale de acá. La última hoja es la hoja de fórmulas, para imprimir y tener a mano.'
+      : 'Este apunte junta lo que vimos en el tercer trimestre: los componentes que trabajan con luz y el transistor como llave. Sirve para estudiar para los simulacros y para el examen: cada consigna que se pregunta sale de acá. La última hoja es la hoja de fórmulas, para imprimir y tener a mano.';
+    let h = `<div class="enc"><img src="logo.jpg" alt=""><div class="t"><b>Instituto Técnico Privado «Ing. Anacleto Tobar» · F-77</b><span>${B.nombre} · ${B.anio} · Docente: Lic. Gutiérrez · Apunte para estudiar</span></div></div>
+      <h1>${B.nombre}: apunte y hoja de fórmulas</h1><p>${intro}</p>
+      <div class="caja amb"><b>Cómo se resuelve cualquier cuenta, en 5 pasos.</b> 1) Escribí los datos con su unidad. 2) Escribí qué te piden. 3) Escribí la fórmula. 4) Reemplazá los números con sus unidades. 5) Escribí el resultado con su unidad y encerralo.</div>
+      <div class="caja"><b>Cómo son los simulacros y el examen.</b> Hay consignas <b>sencillas</b> (definiciones), de <b>comprensión</b> (explicar por qué), <b>genuinas o casos reales</b> (algo de la vida diaria) y <b>cuentas</b>, más una pregunta para pensar sobre tu trabajo. Cada alumno tiene sus propios números. Los simulacros del 30/10 y del 6/11 tienen nota y se promedian con la del examen.</div>`;
+    B.repaso.forEach((s, k) => {
+      const ej = ejemplo(s.tema);
+      h += `<div class="tema"><h2>${k + 1}. ${s.t}</h2><div class="fila2"><div><ul>${s.items.map((i) => `<li>${i}</li>`).join('')}</ul>${s.tabla ? tabla(s.tabla) : ''}</div>
+        <div>${s.fig ? `<div class="fig">${s.fig()}</div>` : ''}${s.fig2 ? `<div class="fig">${s.fig2()}</div>` : ''}${s.foto ? `<figure class="foto"><img src="${s.foto}" alt=""><figcaption>${s.pie || ''}</figcaption></figure>` : ''}</div></div>
+        ${s.fx && s.fx.length ? `<div class="fxs">${s.fx.map((x) => `<span class="fx">$${x}$</span>`).join('')}</div>` : ''}
+        ${ej ? `<div class="ej"><div><b>Ejemplo resuelto.</b> ${ej.enun}${pasosEj(ej)}</div>${ej.fig ? `<div class="fig">${ej.fig}</div>` : ''}</div>` : ''}</div>`;
+    });
+    h += `<div class="salto"></div><div class="enc"><img src="logo.jpg" alt=""><div class="t"><b>Hoja de fórmulas · ${B.nombre}</b><span>${B.anio} · Para imprimir, copiar en la carpeta y tener a mano en los simulacros y el examen</span></div></div>
+      <div class="resumen-fx">${B.repaso.filter((s) => s.fx && s.fx.length).map((s) => `<div class="g"><b>${s.t}</b>${s.fx.map((x) => `<div>$${x}$</div>`).join('')}</div>`).join('')}
+      ${B.curso === 'e1' ? `<div class="g"><b>Valores para recordar</b><div>$V_F$: infrarrojo $1{,}3\\,\\mathrm{V}$ · rojo $1{,}9\\,\\mathrm{V}$ · ámbar $2{,}1\\,\\mathrm{V}$ · verde, azul y blanco $3{,}2\\,\\mathrm{V}$</div><div>$V_{BE} = 0{,}7\\,\\mathrm{V}$ · $V_{CE(sat)} = 0{,}2\\,\\mathrm{V}$</div><div>$1\\,\\mathrm{mA} = 0{,}001\\,\\mathrm{A}$ · $1\\,\\mu\\mathrm{A} = 0{,}000\\,001\\,\\mathrm{A}$ · $1\\,\\mathrm{k}\\Omega = 1000\\,\\Omega$</div></div>`
+        : `<div class="g"><b>Valores para recordar</b><div>BJT saturado: $0{,}2\\,\\mathrm{V}$ · MOSFET encendido: centésimas de volt</div><div>Red de $50\\,\\mathrm{Hz}$: ciclo $20\\,\\mathrm{ms}$, semiciclo $10\\,\\mathrm{ms} = 180^\\circ$</div><div>Corte de la banda: $-3\\,\\mathrm{dB}$ = 70 % de la meseta</div><div>$1\\,\\mathrm{MHz} = 1000\\,\\mathrm{kHz}$ · $1\\,\\mathrm{k}\\Omega = 1000\\,\\Omega$</div></div>`}</div>
+      <div class="caja amb" style="margin-top:8px"><b>Antes de entregar, revisá:</b> ¿escribí la fórmula antes de reemplazar? ¿puse las unidades? ¿el resultado tiene sentido (no da negativo ni enorme)? ¿lo encerré?</div>
+      <div class="pie">Instituto Técnico Privado «Ing. Anacleto Tobar» · ${B.nombre} · Lic. Gutiérrez</div><div class="cred" id="cred"></div>`;
+    const el = document.getElementById('doc'); el.innerHTML = h;
+    EX.mate(el);
+    fetch('fotos/creditos.json').then((r) => r.json()).then((c) => { const u = B.repaso.map((s) => s.foto).filter(Boolean).map((x) => x.replace(/^fotos\/|\.jpg$/g, ''));
+      document.getElementById('cred').textContent = 'Fotos de Wikimedia Commons: ' + u.filter((k) => c[k]).map((k) => `${c[k].titulo}, ${c[k].autor || 'autor desconocido'} (${c[k].licencia})`).join(' · ') + '.'; }).catch(() => {})
+      .finally(() => { Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => { i.onload = i.onerror = r; }))).then(() => { window.__listo = true; }); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -7,17 +7,22 @@
 <title>Práctica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="katex/katex.min.css">
 <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
 <header class="barra"><div class="barra-in"><img src="logo.jpg" alt="IAT"><div class="t" id="curso">Práctica</div><div class="der" id="quien"></div></div></header>
 <main class="envoltura" id="app"><p>Cargando…</p></main>
 <script src="config.js"></script>
+<script src="katex/katex.min.js"></script>
+<script src="katex/contrib/auto-render.min.js"></script>
+<script src="figuras.js"></script>
+<script src="examen.js"></script>
 <script>
 (function () {
   var c = (new URLSearchParams(location.search).get('c') || '').toLowerCase();
   if (c !== 'e1' && c !== 'e2') { location.replace('index.html'); return; }
-  ['circuitos.js', 'banco-' + c + '.js', 'motor.js'].forEach(function (src) { var s = document.createElement('script'); s.src = src; s.async = false; document.body.appendChild(s); });
+  ['banco-' + c + '.js', 'motor.js'].forEach(function (src) { var s = document.createElement('script'); s.src = src + '?v=2'; s.async = false; document.body.appendChild(s); });
 })();
 </script>
 </body>

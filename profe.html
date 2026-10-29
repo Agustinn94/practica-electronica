@@ -7,6 +7,7 @@
 <title>Docente · Práctica de Electrónica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="katex/katex.min.css">
 <link rel="stylesheet" href="estilo.css">
 <style>
 .envoltura{max-width:1200px}
@@ -36,6 +37,10 @@
 .cols{display:grid;grid-template-columns:2fr 1fr;gap:16px}
 @media (max-width:900px){.cols{grid-template-columns:1fr}}
 .codigo{font-size:24px;font-weight:900;letter-spacing:.12em;color:var(--amb)}
+.al{cursor:pointer}.al:hover{border-color:var(--amb)}
+#examen .it{border-top:1px solid var(--borde);padding:12px 0}
+#examen .q{font-size:17px;line-height:1.5}
+.ex-f{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media (max-width:700px){.ex-f{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -51,7 +56,7 @@
   <div id="tablero" class="oculto">
     <div class="fila" style="justify-content:space-between">
       <div class="tabs"><button data-c="e1">Electrónica 1</button><button data-c="e2">Electrónica 2</button></div>
-      <div class="fila"><button class="btn sec" id="sonido">🔔 Activar sonido</button><a class="btn sec" id="planilla" target="_blank" rel="noopener" style="text-decoration:none">📊 Planilla</a><button class="btn sec" id="limpiar">🧹 Limpiar tablero</button><button class="btn sec" id="ajustes">⚙️</button></div>
+      <div class="fila"><button class="btn sec" id="qr">📲 QR para los chicos</button><button class="btn sec" id="sonido">🔔 Activar sonido</button><a class="btn sec" id="planilla" target="_blank" rel="noopener" style="text-decoration:none">📊 Planilla</a><button class="btn sec" id="limpiar">🧹 Limpiar tablero</button><button class="btn sec" id="ajustes">⚙️</button></div>
     </div>
     <div class="marcador" id="resumen"></div>
     <div class="cols">
@@ -59,9 +64,21 @@
       <div><div class="tarjeta"><b>Código del trabajo para dictar</b><div id="codigos"></div></div>
         <div class="tarjeta"><b>Avisos</b><div class="lista-al" id="alertas"><p class="sub">Todavía no hay avisos.</p></div></div></div>
     </div>
+    <div class="tarjeta" id="buscar"><h2 style="margin-top:0">🔎 Ver el examen de un alumno, resuelto</h2>
+      <p class="sub" style="font-size:15px">Cada alumno tiene sus propios números. Poné el nombre como lo escribió él y su número de lista (o tocá su tarjeta de arriba) y te muestra sus consignas con la resolución paso a paso, para explicarle en el banco.</p>
+      <div class="ex-f"><div><label class="campo">Actividad</label><select class="txt" id="ex-act"></select></div><div><label class="campo">N.° de lista</label><input class="txt" id="ex-lis" inputmode="numeric"></div></div>
+      <label class="campo">Nombre y apellido (como lo escribió el alumno)</label><input class="txt" id="ex-nom">
+      <div class="fila" style="margin-top:10px"><button class="btn" id="ex-ver">Ver su examen</button></div><div id="examen"></div></div>
   </div>
 </main>
 <script src="config.js"></script>
+<script src="katex/katex.min.js"></script>
+<script src="katex/contrib/auto-render.min.js"></script>
+<script src="qrcode.js"></script>
+<script src="figuras.js"></script>
+<script src="examen.js"></script>
+<script src="banco-e1.js?v=2"></script>
+<script src="banco-e2.js?v=2"></script>
 <script>
 (function(){
 'use strict';
@@ -70,10 +87,21 @@ const g=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v}catch(e)
 const esc=x=>String(x==null?'':x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let URL_=g('profe_url',(window.CONFIG&&CONFIG.URL)||''), CLAVE=g('profe_clave',''), curso=g('profe_curso','e1'), demo=false, sonido=false, vistos=new Set(), primera=true, timer=null, ac=null;
 $('#url').value=URL_; $('#clave').value=CLAVE;
-const BANCOS={};
-function cargarBanco(c){return new Promise(r=>{const sc=document.createElement('script');sc.src='banco-'+c+'.js';sc.onload=()=>{BANCOS[c]=window.BANCO;r()};sc.onerror=r;document.body.appendChild(sc)})}
-cargarBanco('e1').then(()=>cargarBanco('e2')).then(pintarCodigos);
-function pintarCodigos(){const b=BANCOS[curso];$('#codigos').innerHTML=b?b.actividades.map(a=>`<div style="margin-top:8px"><div>${esc(a.nombre)}</div><div class="codigo">${esc(a.codigo)}</div><div class="sub" style="font-size:13px">${a.opc+a.num} preguntas · ${a.minutos} minutos</div></div>`).join(''):''}
+const BANCOS=window.BANCOS, EX=window.EX;
+const hm=t=>new Date(t).toLocaleString('es-AR',{weekday:'short',day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'America/Argentina/Buenos_Aires'});
+function pintarCodigos(){const b=BANCOS[curso];if(!b)return;$('#codigos').innerHTML=b.actividades.map(a=>`<div style="margin-top:10px"><div>${esc(a.nombre)}</div><div class="codigo">${esc(a.codigo)}</div><div class="sub" style="font-size:13px">${a.opc+a.num} consignas · ${a.minutos} minutos${a.vence?` · se cierra ${hm(Date.parse(a.vence))}`:''}</div>${a.tarde?`<div class="sub" style="font-size:13px">Para el que faltó con justificación hay un código aparte: está en el archivo de la planilla.</div>`:''}</div>`).join('');
+  $('#ex-act').innerHTML=b.actividades.map(a=>`<option value="${a.id}">${esc(a.nombre)}</option>`).join('')}
+pintarCodigos();
+function verExamen(){const b=BANCOS[curso],act=b.actividades.find(a=>a.id===$('#ex-act').value),nom=$('#ex-nom').value.trim(),lis=+$('#ex-lis').value;
+  if(!nom||!lis){$('#examen').innerHTML='<div class="aviso ro">Poné el nombre y el número de lista.</div>';return}
+  const qs=EX.armarExamen(b,act,{nombre:nom,lista:lis});
+  $('#examen').innerHTML=`<h3>${esc(nom)} · N.° ${lis} · ${esc(act.nombre)}</h3>`+qs.map((p,k)=>`<div class="it"><div class="q"><b>${k+1}.</b> <span class="etq">${p.et}</span> ${esc(p.tema)}<br>${p.enun}</div>${p.fig?`<div class="fig">${p.fig}</div>`:''}
+    ${p.tipo==='opc'?`<div style="margin-top:6px"><b>Opciones:</b> ${p.opciones.map((o,i)=>`${'ABCD'[i]}) ${o}`).join(' · ')}</div>`:''}<div style="margin-top:6px"><b>Respuesta correcta:</b> ${EX.respuestaHTML(p)}</div>${EX.resolucionHTML(p)}</div>`).join('');
+  EX.mate($('#examen'));$('#examen').scrollIntoView({behavior:'smooth'})}
+$('#ex-ver').onclick=verExamen;
+$('#qr').onclick=()=>{const u=location.href.replace(/profe\.html.*$/,'alumno.html?c='+curso);const q=qrcode(0,'M');q.addData(u);q.make();
+  const m=document.createElement('div');m.id='modal';m.innerHTML=`<div class="caja" style="max-width:640px;text-align:center"><h2 style="margin-top:0">${esc(BANCOS[curso].nombre)}: escaneen con la cámara</h2><div style="background:#fff;border-radius:16px;padding:16px;display:inline-block">${q.createSvgTag({cellSize:10,margin:2})}</div><p style="font-size:20px;word-break:break-all">${esc(u)}</p><button class="btn" id="qr-x">Cerrar</button></div>`;
+  document.body.appendChild(m);$('#qr-x').onclick=()=>m.remove()};
 function pitido(){if(!sonido)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();[0,.18].forEach((d,i)=>{const o=ac.createOscillator(),v=ac.createGain();o.frequency.value=i?660:880;v.gain.setValueAtTime(.0001,ac.currentTime+d);v.gain.exponentialRampToValueAtTime(.35,ac.currentTime+d+.02);v.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d+.16);o.connect(v).connect(ac.destination);o.start(ac.currentTime+d);o.stop(ac.currentTime+d+.18)})}catch(e){}}
 function toast(t){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';document.body.appendChild(el)}el.textContent=t;clearTimeout(el._t);el._t=setTimeout(()=>el.remove(),6000);try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
   let n=0;clearInterval(toast.ti);const t0=document.title;toast.ti=setInterval(()=>{document.title=(n++%2)?'🚨 '+t:'Profe · Práctica';if(n>8){clearInterval(toast.ti);document.title='Profe · Práctica de Electrónica'}},700)}
@@ -88,11 +116,12 @@ function pintar(d){
     if(e==='trabajando')nT++; if(e==='afuera')nA++; if(e==='entregó')nE++; if(e==='practicando')nS++;
     const cls=e==='entregó'?'entrego':e==='practicando'?'practicando2':e, pct=a.total?Math.round(100*(a.respondidas||0)/a.total):0;
     const chip=e==='afuera'?'<span class="chip ro">AFUERA</span>':e==='entregó'?'<span class="chip ve">entregó</span>':e==='practicando'?'<span class="chip">📘 practica</span>':sin?'<span class="chip">sin señal</span>':'<span class="chip">✍️ trabaja</span>';
-    return `<div class="al ${cls} ${sin?'sinsenal':''}"><div class="est">${chip}</div><div class="n">${a.lista?esc(a.lista)+'. ':''}${esc(a.alumno)}</div>
+    return `<div class="al ${cls} ${sin?'sinsenal':''}" data-nom="${esc(a.alumno)}" data-lis="${esc(a.lista)}" data-act="${esc(a.actividad||'')}"><div class="est">${chip}</div><div class="n">${a.lista?esc(a.lista)+'. ':''}${esc(a.alumno)}</div>
       <div class="s">${esc(a.actividad||'')}</div>
       ${e==='entregó'?`<div class="notag">${esc(a.nota)}</div>`:a.total?`<div class="barra"><div style="width:${pct}%"></div></div><div class="s">pregunta ${a.pregunta||1} de ${a.total} · respondió ${a.respondidas||0}</div>`:''}
       ${e==='practicando'?`<div class="s">${a.series||0} prácticas · ${a.bien||0} consignas bien</div>`:''}
-      <div class="s">${a.salidas?`<span class="sal">🚨 salió ${a.salidas} ${a.salidas==1?'vez':'veces'}</span>${a.fuera_s?` · ${a.fuera_s} s afuera`:''} · `:''}${hace(ahora-(a.ultima||ahora))}</div></div>`}).join('');
+      <div class="s">${a.salidas?`<span class="sal">🚨 salió ${a.salidas} ${a.salidas==1?'vez':'veces'}</span>${a.fuera_s?` · ${a.fuera_s} s afuera`:''} · `:''}${a.fotos?`📷 ${a.fotos} ${a.fotos==1?'foto':'fotos'} · `:''}${a.libres?`🧪 ${a.libres} simulacro${a.libres==1?'':'s'} libre${a.libres==1?'':'s'} (último: ${esc(a.nota_libre)}) · `:''}${hace(ahora-(a.ultima||ahora))}</div></div>`}).join('');
+  document.querySelectorAll('#grid .al').forEach(el=>el.onclick=()=>{$('#ex-nom').value=el.dataset.nom;$('#ex-lis').value=el.dataset.lis;const b=BANCOS[curso],a=b&&b.actividades.find(x=>x.nombre===el.dataset.act);if(a)$('#ex-act').value=a.id;verExamen()});
   $('#vacio').textContent=al.length?'':'Todavía no entró nadie. Cuando los chicos abran la página aparecen acá.';
   $('#resumen').innerHTML=`<span class="chip">✍️ trabajando: ${nT}</span><span class="chip ${nA?'ro':''}">🚨 afuera: ${nA}</span><span class="chip ve">✔ entregaron: ${nE}</span><span class="chip">📘 practicando: ${nS}</span>`;
   const als=(d.alertas||[]).slice().reverse();

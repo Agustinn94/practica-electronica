@@ -1,0 +1,80 @@
+{
+ "diac": {
+  "titulo": "Diac 01.jpg",
+  "autor": "Konto na chwilę",
+  "licencia": "CC BY-SA 4.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Diac_01.jpg"
+ },
+ "dimmer": {
+  "titulo": "Dimmer Light Switch.jpg",
+  "autor": "Paolomarco",
+  "licencia": "CC BY-SA 4.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Dimmer_Light_Switch.jpg"
+ },
+ "fototransistor": {
+  "titulo": "Fototranzystor.jpg",
+  "autor": "Paweł Wiesław Kaczorowski",
+  "licencia": "CC BY-SA 2.5",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Fototranzystor.jpg"
+ },
+ "mosfet": {
+  "titulo": "IRFZ44N N-Channel power MOSFET transistor (1).jpg",
+  "autor": "Suyash Dwivedi",
+  "licencia": "CC BY-SA 4.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:IRFZ44N_N-Channel_power_MOSFET_transistor_(1).jpg"
+ },
+ "dimmer_placa": {
+  "titulo": "Light dimmer circuit (PCB).jpg",
+  "autor": "Benjaminpvera",
+  "licencia": "CC BY-SA 4.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Light_dimmer_circuit_(PCB).jpg"
+ },
+ "opto": {
+  "titulo": "Opto-isolator 4n25.jpg",
+  "autor": "Stefan Riepl (Quark48)",
+  "licencia": "Public domain",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Opto-isolator_4n25.jpg"
+ },
+ "fotodiodo": {
+  "titulo": "Photodiode-closeup.jpg",
+  "autor": "John Maushammer, took this picture on Aug 2, 2006. (user Morcheeba)",
+  "licencia": "CC BY-SA 2.5",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Photodiode-closeup.jpg"
+ },
+ "ldr": {
+  "titulo": "Photoresistor with orange background-7536.jpg",
+  "autor": "Raimond Spekking",
+  "licencia": "CC BY-SA 4.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Photoresistor_with_orange_background-7536.jpg"
+ },
+ "celda": {
+  "titulo": "Solar cell.png",
+  "autor": "Unknown authorUnknown author",
+  "licencia": "Public domain",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Solar_cell.png"
+ },
+ "transistores": {
+  "titulo": "Transistorer (croped).jpg",
+  "autor": "Mister rf at English Wikipedia",
+  "licencia": "CC BY-SA 3.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Transistorer_(cropped).jpg"
+ },
+ "opamp": {
+  "titulo": "Ua741 opamp.jpg",
+  "autor": "Teravolt (talk)",
+  "licencia": "CC BY 3.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Ua741_opamp.jpg"
+ },
+ "leds": {
+  "titulo": "Verschiedene LEDs.jpg",
+  "autor": "Afrank99",
+  "licencia": "CC BY-SA 2.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Verschiedene_LEDs.jpg"
+ },
+ "triac": {
+  "titulo": "Emerson Network Power 7001232-J200 - STMicroelectronis BTA08-800BW-92805.jpg",
+  "autor": "Raimond Spekking",
+  "licencia": "CC BY-SA 4.0",
+  "fuente": "https://commons.wikimedia.org/wiki/File:Emerson_Network_Power_7001232-J200_-_STMicroelectronis_BTA08-800BW-92805.jpg"
+ }
+}
