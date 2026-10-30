@@ -47,13 +47,13 @@
 <div class="hoja" id="doc">Cargando…</div>
 <script src="katex/katex.min.js"></script>
 <script src="katex/contrib/auto-render.min.js"></script>
-<script src="figuras.js"></script>
-<script src="examen.js"></script>
+<script src="figuras.js?v=3"></script>
+<script src="examen.js?v=3"></script>
 <script>
 (function () {
   var c = (new URLSearchParams(location.search).get('c') || '').toLowerCase();
   if (c !== 'e1' && c !== 'e2') c = 'e2';
-  var s = document.createElement('script'); s.src = 'banco-' + c + '.js?v=2'; s.onload = armar; document.body.appendChild(s);
+  var s = document.createElement('script'); s.src = 'banco-' + c + '.js?v=3'; s.onload = armar; document.body.appendChild(s);
   function armar() {
     const B = window.BANCO, EX = window.EX;
     document.title = 'Apunte y hoja de fórmulas · ' + B.nombre;

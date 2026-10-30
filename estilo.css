@@ -107,9 +107,6 @@ body.tp-activo{user-select:none;-webkit-user-select:none}
 /* la compu se ve igual que el celular, solo que más grande */
 .barra-in{display:flex;align-items:center;gap:12px;width:100%;max-width:760px;margin:0 auto}
 header.barra{display:block}
-@media (min-width:1000px){html.app{zoom:1.25}}
-@media (min-width:1400px){html.app{zoom:1.45}}
-@media (min-width:1900px){html.app{zoom:1.7}}
 
 /* consignas según los lineamientos */
 .etq{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.1em;padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle;background:#475569;color:#fff}
@@ -186,3 +183,49 @@ body.tp-activo textarea,body.tp-activo input{-webkit-user-select:text;user-selec
 .foto-real{margin:10px 0;text-align:center}.foto-real img{max-width:100%;max-height:300px;border-radius:12px;border:1px solid var(--borde)}
 .foto-real figcaption{font-size:14px;color:var(--suave);margin-top:4px}
 .creditos{font-size:12px;color:var(--suave);line-height:1.4}
+
+/* ===== tema claro (oct. 2026): más liviano a la vista, igual en compu y celu ===== */
+:root{--fondo:#f3f6fb;--panel:#ffffff;--panel2:#eef3f9;--tinta:#13233a;--suave:#5a6b83;--amb:#f59e0b;--ve:#059669;--ro:#dc2626;--az:#2563eb;--vi:#7c3aed;--cel:#0e7490;--borde:#dbe3ee}
+html,body{background:var(--fondo);color:var(--tinta)}
+header.barra{background:#ffffffee;backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(19,35,58,.06)}
+header.barra img{box-shadow:0 0 0 1px var(--borde)}
+.tarjeta{box-shadow:0 4px 18px rgba(19,35,58,.06)}
+.grande:hover,.grande:focus{border-color:var(--az);box-shadow:0 8px 24px rgba(37,99,235,.12)}
+input.txt,select.txt,textarea.txt{background:#fff;color:var(--tinta)}
+input.txt:focus,select.txt:focus,textarea.txt:focus{border-color:var(--az)}
+.btn{color:#1b1200}.btn.ve{color:#fff}.btn.ro{color:#fff}
+.btn.sec{background:var(--panel2);color:var(--tinta);border:1px solid var(--borde)}
+.op .l,.puntitos i,.foto-min{background:var(--panel2)}
+.puntitos i.hecho{color:#fff}.puntitos i.bien,.puntitos i.mal,.chip.ro,.chip.ve,.reloj.poco{color:#fff}
+.devol .proc{color:#334155}
+.paso-r{background:#f8fafc}
+.paso-r .pn{color:#fff}
+.sim{background:#f0f9ff}.sim-res{background:#fff}
+.calc .pant{background:#0f172a;color:#fff}.calc .teclas button{background:var(--panel2);color:var(--tinta)}.calc .teclas button.nu{background:#dbe6f5;color:var(--tinta)}
+#cartel{background:rgba(15,23,42,.82)}#cartel .caja{background:#fff}
+#modal{background:rgba(15,23,42,.5);backdrop-filter:blur(3px)}
+#modal .caja{box-shadow:0 20px 60px rgba(15,23,42,.25)}
+.aviso{background:#fff8e6;border-color:#f6c35b}.aviso.ro{background:#fdecec;border-color:#f3a6a6}.aviso.ve{background:#e8f8f1;border-color:#93dcc0}.aviso.amb{background:#fff3d6;border-color:#f6b94a}
+a{color:var(--az)}
+/* ventanas con cabecera fija y ✕ siempre a la vista */
+#modal .caja.ventana{padding:0;display:flex;flex-direction:column;max-height:min(88vh,820px);overflow:hidden}
+#modal .caja.hoja.ventana{max-width:760px}
+.v-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px 12px 18px;border-bottom:1px solid var(--borde);background:var(--panel)}
+.v-cab b{font-size:19px}
+.v-x{flex:0 0 42px;width:42px;height:42px;border-radius:50%;border:1px solid var(--borde);background:var(--panel2);color:var(--tinta);font-size:20px;font-weight:900;cursor:pointer;line-height:1}
+.v-x:hover{background:#e2e8f0}
+.v-cuerpo{overflow:auto;padding:12px 18px 18px;-webkit-overflow-scrolling:touch}
+.v-cuerpo .hoja-sec{margin:6px 0 14px}.v-cuerpo .hoja-sec>b{display:block;margin-bottom:6px;color:var(--az)}
+.v-cuerpo .formulas{display:flex;flex-wrap:wrap;gap:8px}
+.calc.ventana .v-cuerpo{padding-top:14px}
+@media (max-width:520px){#modal{padding:10px;align-items:flex-end}#modal .caja.ventana{max-height:92vh;border-radius:18px}.v-cuerpo .formulas .fx{font-size:16px}}
+/* la tarjeta del simulacro con nota se distingue de todo lo demás */
+.tarjeta.grande.con-nota{background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 100%);border:2px solid #fb923c;box-shadow:0 8px 26px rgba(251,146,60,.22);position:relative}
+.tarjeta.grande.con-nota b{color:#9a3412}
+.tarjeta.grande.con-nota .sello{position:absolute;top:12px;right:14px;background:#ea580c;color:#fff;font-weight:900;font-size:12px;letter-spacing:.08em;padding:4px 10px;border-radius:999px}
+.tarjeta.grande.con-nota .prox{display:block;clear:both;margin-top:10px;padding-top:8px;border-top:1px dashed #fdba74;color:#7c2d12;font-size:15px}
+.tarjeta.grande.con-nota .prox i{font-style:normal;display:block}
+.tarjeta.grande.clase{background:linear-gradient(135deg,#eff6ff 0%,#e0ecff 100%);border-color:#93b4f5}
+.menu-sep{margin:22px 0 4px;font-size:13px;font-weight:900;letter-spacing:.1em;color:var(--suave);text-transform:uppercase}
+#modal .caja.ventana{max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);margin:auto}
+#modal{overflow:auto}

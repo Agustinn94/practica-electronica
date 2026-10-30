@@ -37,7 +37,7 @@
     return p;
   }
   const normal = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
-  function semillaExamen(B, act, alumno) { return [B.curso, act.id, normal(alumno.nombre), alumno.lista].join('|'); }
+  function semillaExamen(B, act, alumno) { return [B.curso, act.id, alumno.lista].join('|'); }
   // examen de un alumno: siempre el mismo para el mismo nombre y número de lista
   function armarExamen(B, act, alumno, semilla) {
     const r = rng(semilla || semillaExamen(B, act, alumno));

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="katex/katex.min.css">
-<link rel="stylesheet" href="estilo.css">
+<link rel="stylesheet" href="estilo.css?v=3">
 <style>
   .indice { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px }
   .indice a { text-decoration: none }
@@ -46,15 +46,15 @@
 <div id="proy"></div>
 <script src="katex/katex.min.js"></script>
 <script src="katex/contrib/auto-render.min.js"></script>
-<script src="figuras.js"></script>
-<script src="examen.js"></script>
-<script src="simuladores.js"></script>
+<script src="figuras.js?v=3"></script>
+<script src="examen.js?v=3"></script>
+<script src="simuladores.js?v=3"></script>
 <script src="qrcode.js"></script>
 <script>
 (function () {
   var c = (new URLSearchParams(location.search).get('c') || '').toLowerCase();
   if (c !== 'e1' && c !== 'e2') { location.replace('index.html'); return; }
-  var s = document.createElement('script'); s.src = 'banco-' + c + '.js?v=2'; s.onload = arrancar; document.body.appendChild(s);
+  var s = document.createElement('script'); s.src = 'banco-' + c + '.js?v=3'; s.onload = arrancar; document.body.appendChild(s);
 
   function arrancar() {
     const B = window.BANCO, EX = window.EX, $ = (x) => document.querySelector(x);
@@ -81,7 +81,7 @@
         ${ej ? `<div class="tarjeta ejemplo"><h3>Ejemplo resuelto</h3>${ej.fig ? `<div class="fig">${ej.fig}</div>` : ''}<div class="enun">${ej.enun}</div>${EX.resolucionHTML(ej)}</div>` : ''}</section>`;
     }).join('');
     $('#app').innerHTML = `<h1>Repaso de ${B.nombre}</h1><p class="sub">Todo lo que se pregunta en la práctica y en los simulacros sale de acá. Leelo antes de empezar y volvé cuando tengas una duda.</p>
-      <div class="fila"><button class="btn" id="b-proy">📽️ Proyectar en clase</button><a class="btn sec" href="apunte-${B.curso}.pdf" target="_blank" rel="noopener">📄 PDF para imprimir</a></div>
+      <div class="fila"><a class="btn" href="clase.html?c=${B.curso}">🎬 Ver en diapositivas</a><a class="btn sec" href="apunte-${B.curso}.pdf" target="_blank" rel="noopener">📄 PDF para imprimir</a></div>
       <div class="indice">${B.repaso.map((s, k) => `<a class="chip" href="#${encodeURIComponent(s.tema)}">${k + 1}. ${s.t}</a>`).join('')}</div>
       <div class="aviso"><b>Cómo se resuelve una cuenta, siempre igual:</b> 1) datos con su unidad · 2) qué piden · 3) fórmula · 4) reemplazo · 5) resultado con unidad.</div>
       ${secs}<div class="fila"><a class="btn" href="alumno.html?c=${B.curso}">Ir a practicar →</a></div><p class="creditos" id="creditos"></p>`;
@@ -143,7 +143,7 @@
       if (d.sim) { const x = SIM.html(d.sim); $('#proy-sim').innerHTML = x.html; SIM.init(d.sim, x.p); }
       EX.mate(p);
     }
-    $('#b-proy').onclick = () => { $('#proy').classList.add('on'); k = 0; mostrar(); try { document.documentElement.requestFullscreen(); } catch (e) {} };
+    if ($('#b-proy')) $('#b-proy').onclick = () => { $('#proy').classList.add('on'); k = 0; mostrar(); try { document.documentElement.requestFullscreen(); } catch (e) {} };
     document.addEventListener('keydown', (e) => {
       if (!$('#proy').classList.contains('on')) return;
       if ([' ', 'ArrowRight', 'PageDown', 'Enter'].includes(e.key)) { e.preventDefault(); if (k < diap.length - 1) { k++; mostrar(); } }

@@ -241,12 +241,13 @@
     explic: 'El TRIAC regula potencia en corriente alterna de 220 V: dimmers, reguladores de ventiladores, taladros. El cargador y el control trabajan en continua.' }; } });
 
   window.BANCOS.e2 = window.BANCO = {
-    curso: 'e2', nombre: 'Electrónica 2', anio: '5.° año',
+    curso: 'e2', nombre: 'Electrónica 2', anio: '5.° año', listas: 13,
     temas: ['MOSFET', 'Realimentación', 'Topologías', 'Ancho de banda', 'Operacional', 'TRIAC'],
     preguntas: P,
     actividades: [
-      { id: 'sim1', nombre: 'Simulacro de examen 1', codigo: 'SIMU1', minutos: 50, opc: 5, num: 5, fotos: true, simulacro: true, abre: '2026-10-30T07:00:00-03:00', vence: '2026-10-30T11:10:00-03:00', tarde: '3446007388' },
-      { id: 'sim2', nombre: 'Simulacro de examen 2', codigo: 'SIMU2', minutos: 50, opc: 5, num: 5, fotos: true, simulacro: true, abre: '2026-11-06T07:00:00-03:00', vence: '2026-11-06T11:10:00-03:00', tarde: '2194967439' },
+      { id: 'sim1', nombre: 'Simulacro de examen 1', codigo: 'SIMU1', minutos: 70, opc: 4, num: 6, minimo: 20, fotos: true, simulacro: true, abre: '2026-10-30T07:00:00-03:00', vence: '2026-10-30T11:10:00-03:00', tarde: '3446007388' },
+      { id: 'sim2', nombre: 'Simulacro de examen 2', codigo: 'SIMU2', minutos: 70, opc: 4, num: 6, minimo: 20, fotos: true, simulacro: true, abre: '2026-11-06T07:00:00-03:00', vence: '2026-11-06T11:10:00-03:00', tarde: '2194967439' },
+      { id: 'examen', nombre: 'Examen', codigo: 'EXAMEN', minutos: 80, opc: 4, num: 6, minimo: 30, fotos: true, simulacro: true, abre: '2026-11-17T07:00:00-03:00', vence: '2026-11-17T11:50:00-03:00', tarde: '1739748795' },
     ],
     // ---------- repaso: todo lo que se pregunta sale de acá ----------
     repaso: [

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="katex/katex.min.css">
-<link rel="stylesheet" href="estilo.css">
+<link rel="stylesheet" href="estilo.css?v=3">
 <style>
 .envoltura{max-width:1200px}
 .tabs{display:flex;gap:8px;margin:10px 0}
@@ -67,18 +67,18 @@
     <div class="tarjeta" id="buscar"><h2 style="margin-top:0">🔎 Ver el examen de un alumno, resuelto</h2>
       <p class="sub" style="font-size:15px">Cada alumno tiene sus propios números. Poné el nombre como lo escribió él y su número de lista (o tocá su tarjeta de arriba) y te muestra sus consignas con la resolución paso a paso, para explicarle en el banco.</p>
       <div class="ex-f"><div><label class="campo">Actividad</label><select class="txt" id="ex-act"></select></div><div><label class="campo">N.° de lista</label><input class="txt" id="ex-lis" inputmode="numeric"></div></div>
-      <label class="campo">Nombre y apellido (como lo escribió el alumno)</label><input class="txt" id="ex-nom">
+      <input type="hidden" id="ex-nom">
       <div class="fila" style="margin-top:10px"><button class="btn" id="ex-ver">Ver su examen</button></div><div id="examen"></div></div>
   </div>
 </main>
-<script src="config.js"></script>
+<script src="config.js?v=3"></script>
 <script src="katex/katex.min.js"></script>
 <script src="katex/contrib/auto-render.min.js"></script>
 <script src="qrcode.js"></script>
-<script src="figuras.js"></script>
-<script src="examen.js"></script>
-<script src="banco-e1.js?v=2"></script>
-<script src="banco-e2.js?v=2"></script>
+<script src="figuras.js?v=3"></script>
+<script src="examen.js?v=3"></script>
+<script src="banco-e1.js?v=3"></script>
+<script src="banco-e2.js?v=3"></script>
 <script>
 (function(){
 'use strict';
@@ -93,9 +93,9 @@ function pintarCodigos(){const b=BANCOS[curso];if(!b)return;$('#codigos').innerH
   $('#ex-act').innerHTML=b.actividades.map(a=>`<option value="${a.id}">${esc(a.nombre)}</option>`).join('')}
 pintarCodigos();
 function verExamen(){const b=BANCOS[curso],act=b.actividades.find(a=>a.id===$('#ex-act').value),nom=$('#ex-nom').value.trim(),lis=+$('#ex-lis').value;
-  if(!nom||!lis){$('#examen').innerHTML='<div class="aviso ro">Poné el nombre y el número de lista.</div>';return}
+  if(!lis){$('#examen').innerHTML='<div class="aviso ro">Poné el número de lista.</div>';return}
   const qs=EX.armarExamen(b,act,{nombre:nom,lista:lis});
-  $('#examen').innerHTML=`<h3>${esc(nom)} · N.° ${lis} · ${esc(act.nombre)}</h3>`+qs.map((p,k)=>`<div class="it"><div class="q"><b>${k+1}.</b> <span class="etq">${p.et}</span> ${esc(p.tema)}<br>${p.enun}</div>${p.fig?`<div class="fig">${p.fig}</div>`:''}
+  $('#examen').innerHTML=`<h3>${nom?esc(nom)+" · ":""}N.° ${lis} · ${esc(act.nombre)}</h3>`+qs.map((p,k)=>`<div class="it"><div class="q"><b>${k+1}.</b> <span class="etq">${p.et}</span> ${esc(p.tema)}<br>${p.enun}</div>${p.fig?`<div class="fig">${p.fig}</div>`:''}
     ${p.tipo==='opc'?`<div style="margin-top:6px"><b>Opciones:</b> ${p.opciones.map((o,i)=>`${'ABCD'[i]}) ${o}`).join(' · ')}</div>`:''}<div style="margin-top:6px"><b>Respuesta correcta:</b> ${EX.respuestaHTML(p)}</div>${EX.resolucionHTML(p)}</div>`).join('');
   EX.mate($('#examen'));$('#examen').scrollIntoView({behavior:'smooth'})}
 $('#ex-ver').onclick=verExamen;

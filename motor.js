@@ -24,14 +24,14 @@
   const repasoLink = (tema) => `repaso.html?c=${B.curso}#${encodeURIComponent(tema)}`;
 
   // ---------- alumno ----------
-  let yo = leer('yo_' + B.curso, null);
+  let yo = leer('yo_' + B.curso, null); if (yo && !yo.codigo) yo = null;
   const claveAlumno = () => B.curso + '|' + yo.lista + '|' + normal(yo.nombre);
 
   // ---------- envío a la planilla, con cola por si no hay señal ----------
   const COLA = 'cola_' + B.curso;
   function enviar(tipo, extra) {
     if (!yo) return;
-    const d = Object.assign({ curso: B.curso, alumno: yo.nombre, lista: yo.lista, clave_alumno: claveAlumno(), tipo, t: Date.now(), id: Date.now() + '-' + Math.random().toString(36).slice(2, 7) }, extra || {});
+    const d = Object.assign({ curso: B.curso, alumno: yo.nombre, lista: yo.lista, codigo: yo.codigo || "", clave_alumno: claveAlumno(), tipo, t: Date.now(), id: Date.now() + '-' + Math.random().toString(36).slice(2, 7) }, extra || {});
     if (tipo === 'pulso') { mandar(d).catch(() => {}); return; }
     const c = leer(COLA, []); c.push(d); guardar(COLA, c.slice(-300)); vaciar();
   }
@@ -73,6 +73,16 @@
     botones.forEach(([txt, cls, fn]) => { const b = document.createElement('button'); b.className = 'btn ' + (cls || ''); b.textContent = txt; b.onclick = () => { m.remove(); fn && fn(); }; fila.appendChild(b); });
     document.body.appendChild(m); mate(m);
   }
+  function ventana(titulo, cuerpo, cls) {
+    const m = document.createElement('div'); m.id = 'modal';
+    m.innerHTML = `<div class="caja ventana ${cls || ''}" role="dialog" aria-label="${titulo.replace(/<[^>]+>/g, '')}"><div class="v-cab"><b>${titulo}</b><button class="v-x" aria-label="Cerrar" title="Cerrar">✕</button></div><div class="v-cuerpo">${cuerpo}</div></div>`;
+    const cerrar = () => { m.remove(); document.removeEventListener('keydown', esc_); };
+    const esc_ = (e) => { if (e.key === 'Escape') cerrar(); };
+    m.addEventListener('click', (e) => { if (e.target === m) cerrar(); });
+    $('.v-x', m).onclick = cerrar; document.addEventListener('keydown', esc_);
+    document.body.appendChild(m); mate(m); return m;
+  }
+  const esExamen = (a) => /^examen/i.test(a.id);
   const encabezado = (titulo) => `<div class="tarjeta encab"><div class="inst">Instituto Técnico Privado «Ing. Anacleto Tobar» · F-77 · Tucumán</div>
     <div class="tit">${titulo}</div><table class="datos"><tr><td><b>Espacio curricular:</b> ${esc(B.nombre)}</td><td><b>Año:</b> ${esc(B.anio)}</td></tr>
     <tr><td><b>Docente:</b> ${DOCENTE}</td><td><b>Fecha:</b> ${hoy()}</td></tr><tr><td colspan="2"><b>Alumno/a:</b> ${esc(yo.nombre)} · N.° ${yo.lista}</td></tr></table></div>`;
@@ -96,18 +106,26 @@
 
   // ---------- ingreso ----------
   function ingreso() {
-    const listas = Array.from({ length: 40 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+    const listas = Array.from({ length: B.listas || 40 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('') + '<option value="40">Prueba del profe</option>';
     pantalla(`<h1>${esc(B.nombre)}</h1><p class="sub">${esc(B.anio)} · Docente: ${DOCENTE}</p>
-      <div class="tarjeta"><label class="campo" for="nom">Nombre y apellido</label><input class="txt" id="nom" autocomplete="name" maxlength="60" placeholder="Ej.: Juan Pérez">
-      <label class="campo" for="lis">Número de lista</label><select class="txt" id="lis"><option value="">Elegí tu número</option>${listas}</select>
-      <div class="aviso" style="margin-top:12px">Escribilo siempre igual, como figura en la lista del curso. Con tu nombre y tu número se arma tu simulacro y se carga tu nota.</div>
+      <div class="tarjeta"><label class="campo" for="lis">Tu número de lista</label><select class="txt" id="lis"><option value="">Elegí tu número</option>${listas}</select>
+      <label class="campo" for="cod">Tu código personal</label><input class="txt" id="cod" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="4 números">
+      <div class="aviso" style="margin-top:12px">El código te lo da el profe en un papelito y es <b>solo tuyo</b>. Con él se carga tu nota: no se lo pases a nadie.</div>
       <div id="err" class="aviso ro oculto"></div><div style="margin-top:16px"><button class="btn ancho" id="ok">Entrar</button></div></div>`);
-    $('#ok').onclick = () => {
-      const n = lindo($('#nom').value), l = $('#lis').value;
-      if (n.split(' ').length < 2) { $('#err').textContent = 'Poné nombre y apellido.'; $('#err').classList.remove('oculto'); return; }
-      if (!l) { $('#err').textContent = 'Elegí tu número de lista.'; $('#err').classList.remove('oculto'); return; }
-      yo = { nombre: n, lista: +l }; guardar('yo_' + B.curso, yo); cabecera(); menu();
+    const err = (t) => { $('#err').innerHTML = t; $('#err').classList.remove('oculto'); };
+    const listo = () => { $('#ok').disabled = false; $('#ok').textContent = 'Entrar'; };
+    $('#ok').onclick = async () => {
+      const l = +$('#lis').value, c = $('#cod').value.replace(/\D/g, '');
+      if (!l) return err('Elegí tu número de lista.');
+      if (c.length !== 4) return err('El código tiene 4 números.');
+      $('#ok').disabled = true; $('#ok').textContent = 'Revisando…';
+      try {
+        const r = !CFG.URL ? { ok: true, nombre: 'Alumno ' + l } : await fetch(`${CFG.URL}?accion=alumno&curso=${B.curso}&lista=${l}&codigo=${c}`).then((x) => x.json());
+        if (!r.ok) { listo(); return err('Ese código no corresponde a ese número de lista. Revisá el papelito o pedíselo al profe.'); }
+        yo = { nombre: r.nombre, lista: l, codigo: c }; guardar('yo_' + B.curso, yo); cabecera(); menu();
+      } catch (e) { listo(); err('No hay conexión con la planilla. Revisá el wifi o los datos y probá de nuevo.'); }
     };
+    $('#cod').onkeydown = (e) => { if (e.key === 'Enter') $('#ok').click(); };
   }
 
   // ---------- menú ----------
@@ -116,17 +134,20 @@
       const e = estadoAct(a), h = hecho(a);
       if (h) return `<div class="aviso ve"><b>✔ ${esc(a.nombre)}:</b> entregado, nota ${h.nota}.</div>`;
       if (e === 'vencida') return `<div class="aviso ro"><b>${esc(a.nombre)}:</b> venció el ${fechaHora(ms(a.vence))}. Quedó un 1.</div>`;
-      if (e === 'antes') return `<div class="aviso"><b>📅 ${esc(a.nombre)}</b> (con nota): se hace en clase el <b>${fechaHora(ms(a.abre))}</b> y vence ese día a las <b>${hora(ms(a.vence))}</b>.</div>`;
-      return `<div class="aviso amb grande-aviso"><b>📝 ${esc(a.nombre)} con nota: hoy hasta las ${hora(ms(a.vence))}.</b><br>La nota se promedia con la del examen. Si no lo entregás a tiempo, el sistema pone un 1. <span id="falta-${a.id}"></span></div>`;
+      if (e === 'antes') return '';
+      return `<div class="aviso amb grande-aviso"><b>📝 ${esc(a.nombre)} con nota: hoy hasta las ${hora(ms(a.vence))}.</b><br>${esExamen(a) ? 'Es el examen del trimestre.' : 'La nota se promedia con la del examen.'} Si no lo entregás a tiempo, el sistema pone un 1. <span id="falta-${a.id}"></span></div>`;
     }).join('');
   }
   function menu() {
+    const prox = B.actividades.filter((a) => a.vence && estadoAct(a) === 'antes' && !hecho(a)).map((a) => `<i>📅 <b>${esc(a.nombre)}:</b> ${fechaHora(ms(a.abre))}, hasta las ${hora(ms(a.vence))}</i>`).join('');
     pantalla(`<h1>${esc(B.nombre)}</h1><p class="sub">${esc(B.anio)} · ${esc(yo.nombre)}</p>${bannerActividades()}
-      <a class="tarjeta grande" style="text-decoration:none" href="repaso.html?c=${B.curso}"><span class="ic">📖</span><b>1 · Repaso</b><span>La teoría de cada tema, corta y con dibujos. Todo lo que se pregunta sale de acá. Empezá por esto.</span></a>
-      <button class="tarjeta grande" id="m-pra"><span class="ic">📘</span><b>2 · Práctica guiada</b><span>Sin nota. Si te equivocás te da una pista, y después la resolución paso a paso.</span></button>
-      <button class="tarjeta grande" id="m-tp"><span class="ic">📝</span><b>3 · Simulacro con nota</b><span>Con el código que da el docente en clase. La nota se promedia con la del examen.</span></button>
+      <a class="tarjeta grande clase" style="text-decoration:none" href="clase.html?c=${B.curso}"><span class="ic">🎬</span><b>1 · Repaso en diapositivas</b><span>La clase del profe: cada tema con fotos, dibujos, fórmulas y un ejemplo resuelto. <u>Empezá por acá.</u></span></a>
+      <button class="tarjeta grande" id="m-pra"><span class="ic">📘</span><b>2 · Práctica guiada</b><span>Elegís un tema y practicás. Sin nota: si te equivocás te da una pista y después la resolución paso a paso.</span></button>
+      <button class="tarjeta grande" id="m-lib"><span class="ic">🧪</span><b>3 · Simulacro libre</b><span>Un examen de prueba distinto cada vez, con nota al instante. No cuenta para el trimestre: es para entrenar.</span></button>
+      <button class="tarjeta grande con-nota" id="m-tp"><span class="sello">CON NOTA</span><span class="ic">📝</span><b>4 · Simulacro o examen con nota</b><span>Se hace en clase, con el código que da el profe. La nota queda en la planilla.</span>${prox ? `<span class="prox">${prox}</span>` : ''}</button>
+      <div class="menu-sep">Para estudiar en casa</div>
       <a class="tarjeta grande" style="text-decoration:none" href="apunte-${B.curso}.pdf" target="_blank" rel="noopener"><span class="ic">📄</span><b>Apunte y hoja de fórmulas (PDF)</b><span>Para imprimir o copiar en la carpeta: teoría, fórmulas y un ejemplo resuelto de cada cuenta.</span></a>
-      <button class="tarjeta grande" id="m-lib"><span class="ic">🧪</span><b>Simulacro libre</b><span>Un examen de prueba distinto cada vez, con nota al instante. No cuenta para el trimestre: es para entrenar en casa.</span></button>
+      <a class="tarjeta grande" style="text-decoration:none" href="repaso.html?c=${B.curso}"><span class="ic">📖</span><b>Repaso para leer</b><span>Lo mismo que las diapositivas, en texto corto para el celular, con audio.</span></a>
       <p class="pie">¿No sos ${esc(yo.nombre)}? <a href="#" id="salir">Cambiar de alumno</a></p>`);
     $('#m-pra').onclick = elegirPractica; $('#m-tp').onclick = pedirCodigo;
     $('#m-lib').onclick = () => reglas(libre());
@@ -210,7 +231,7 @@
     const enCurso = !act.libre && leer(claveTP(act), null), n = act.opc + act.num;
     const vence = act.vence && !act.autorizadoTarde ? ms(act.vence) : NaN;
     pantalla(`${encabezado(esc(act.nombre))}
-      ${act.libre ? '' : `<div class="aviso amb grande-aviso"><b>Este simulacro tiene nota y se promedia con la del examen.</b>${isFinite(vence) ? `<br>Se entrega <b>hoy hasta las ${hora(vence)}</b>. A esa hora se cierra solo y lo que no se entregó queda con 1.` : ''}</div>`}
+      ${act.libre ? '' : `<div class="aviso amb grande-aviso"><b>${esExamen(act) ? 'Este es el examen del trimestre. Tiene nota.' : 'Este simulacro tiene nota y se promedia con la del examen.'}</b>${isFinite(vence) ? `<br>Se entrega <b>hoy hasta las ${hora(vence)}</b>. A esa hora se cierra solo y lo que no se entregó queda con 1.` : ''}</div>`}
       <div class="tarjeta"><b>Criterios de evaluación</b><ul>
       <li>Son <b>${n} consignas</b> numeradas, cada una vale un punto. Nota = consignas bien, de 1 a 10. Tiempo: <b>${act.minutos} minutos</b>${isFinite(vence) ? ` (o hasta las ${hora(vence)}, lo que llegue primero)` : ''}.</li>
       <li>Hay consignas <b>sencillas</b>, de <b>comprensión</b>, <b>casos reales</b> y <b>cuentas</b>. Cada alumno tiene sus propios números.</li>
@@ -218,7 +239,9 @@
       ${act.fotos ? `<li>📷 En cada cuenta, <b>primero sacás una foto</b> de tu resolución y <b>después</b> escribís el resultado. Sin foto no se puede responder. Las fotos le llegan al docente.</li>` : ''}
       <li>Tenés a mano la <b>calculadora</b> y la <b>hoja de fórmulas</b> adentro de la página. No hace falta salir.</li>
       <li>Al final hay una consigna para pensar sobre tu trabajo. No lleva nota.</li>
-      ${act.libre ? '<li>Este simulacro <b>no cuenta para la nota</b>: al final ves cómo te fue y la resolución de cada consigna.</li>' : `<li><b>No salgas de esta página.</b> Si salís, cambiás de aplicación o abrís la búsqueda del celular, suena una alarma y al docente le llega un aviso con tu nombre. Si fue sin querer, volvés y seguís donde estabas. Abrir la cámara con el botón de la foto está permitido.</li>`}
+      ${act.libre ? '<li>Este simulacro <b>no cuenta para la nota</b>: al final ves cómo te fue y la resolución de cada consigna.</li>' : `<li><b>No salgas de esta página.</b> Si salís, cambiás de aplicación, sacás una captura o abrís la búsqueda del celular, suena una alarma y al profe le llega el aviso con tu nombre al instante. <b>Salir a propósito es desaprobar.</b> Si fue sin querer, avisale al profe: volvés y seguís donde estabas. Abrir la cámara con el botón de la foto está permitido.</li>
+      <li>Cada uno tiene <b>números distintos</b>: está pensado para que lo resuelvas vos, sin ChatGPT. Si te trabás, <b>preguntale al profe</b>.</li>
+      ${act.minimo ? `<li>Tomate tu tiempo: el botón de entregar se habilita a los <b>${act.minimo} minutos</b>, para que revises cada cuenta.</li>` : ''}`}
       </ul>${enCurso ? '<div class="aviso">Ya habías empezado: seguís donde lo dejaste.</div>' : ''}
       <div class="fila" style="margin-top:12px"><button class="btn sec" id="volver">← Volver</button><button class="btn ve" id="go">${enCurso ? 'Seguir' : 'Empezar'}</button></div></div>`);
     $('#volver').onclick = menu;
@@ -277,6 +300,8 @@
     }
     const tic = setInterval(() => { reloj(); if (Date.now() >= fin) { clearInterval(tic); esperarFotos(est).then(() => cerrar(true)); } }, 1000);
     function entregar() {
+      const faltaMin = act.minimo && !act.libre ? Math.ceil(act.minimo - (Date.now() - est.inicio) / 60000) : 0;
+      if (faltaMin > 0) { modal(`<h2 style="margin-top:0">Todavía es temprano</h2><p>Revisá cada cuenta con calma: la fórmula, el reemplazo y la unidad. El botón de entregar se habilita en <b>${faltaMin} min</b>.</p>`, [['Seguir revisando', 'sec']]); return; }
       const sinResp = qs.map((p, k) => k).filter((k) => est.resp[k] === undefined || est.resp[k] === '');
       const sinFoto = qs.map((p, k) => k).filter((k) => pideFoto(qs[k]) && !est.fotos[k]);
       const lista = (arr) => arr.map((k) => `<button class="chip ir-a" data-k="${k}">${k + 1}</button>`).join(' ');
@@ -325,11 +350,8 @@
 
   // ---------- calculadora y hoja de fórmulas (para no tener que salir de la página) ----------
   function calculadora() {
-    const m = document.createElement('div'); m.id = 'modal';
     const T = ['7', '8', '9', '÷', '√', '4', '5', '6', '×', 'x²', '1', '2', '3', '−', 'log', '0', ',', '(', ')', '+', 'π', '×10^', '←', 'C', '='];
-    m.innerHTML = `<div class="caja calc"><div class="fila" style="justify-content:space-between;margin:0 0 8px"><b>🧮 Calculadora</b><button class="btn sec" id="c-x">Cerrar</button></div>
-      <div class="pant"><div id="c-ex"></div><div id="c-res">0</div></div><div class="teclas">${T.map((t) => `<button data-t="${t}" class="${t === '=' ? 'ig' : /[0-9,]/.test(t) ? 'nu' : ''}">${t}</button>`).join('')}</div></div>`;
-    document.body.appendChild(m);
+    const m = ventana('🧮 Calculadora', `<div class="pant"><div id="c-ex"></div><div id="c-res">0</div></div><div class="teclas">${T.map((t) => `<button data-t="${t}" class="${t === '=' ? 'ig' : /[0-9,]/.test(t) ? 'nu' : ''}">${t}</button>`).join('')}</div>`, 'calc');
     let ex = '';
     const pintar = (r) => { $('#c-ex').textContent = ex || ' '; if (r !== undefined) $('#c-res').textContent = r; };
     const evaluar = () => {
@@ -343,13 +365,9 @@
       else if (t === '√') ex += '√('; else if (t === 'log') ex += 'log('; else if (t === 'x²') ex += '²'; else ex += t;
       pintar(evaluar());
     });
-    $('#c-x').onclick = () => m.remove();
   }
   function hojaFormulas() {
-    const m = document.createElement('div'); m.id = 'modal';
-    m.innerHTML = `<div class="caja hoja"><div class="fila" style="justify-content:space-between;margin:0 0 8px"><b>📒 Hoja de fórmulas</b><button class="btn sec" id="h-x">Cerrar</button></div>
-      ${B.repaso.filter((s) => s.fx && s.fx.length).map((s) => `<div class="hoja-sec"><b>${s.t}</b><div class="formulas">${s.fx.map((x) => `<span class="fx">$${x}$</span>`).join('')}</div></div>`).join('')}</div>`;
-    document.body.appendChild(m); mate(m); $('#h-x').onclick = () => m.remove();
+    ventana('📒 Hoja de fórmulas', B.repaso.filter((s) => s.fx && s.fx.length).map((s) => `<div class="hoja-sec"><b>${s.t}</b><div class="formulas">${s.fx.map((x) => `<span class="fx">$${x}$</span>`).join('')}</div></div>`).join(''), 'hoja');
   }
 
   // ---------- fotos de las cuentas ----------
@@ -369,7 +387,7 @@
   function subirFoto(act, est, clave, k, intento) {
     if (!FOTOS[k]) return Promise.resolve();
     if (!CFG.URL) { est.fotos[k] = 'subida'; guardar(clave, est); pintarFoto(k, est); return Promise.resolve(); }
-    const d = { curso: B.curso, alumno: yo.nombre, lista: yo.lista, clave_alumno: claveAlumno(), tipo: 'foto', t: Date.now(), actividad: act.nombre, consigna: k + 1, imagen: FOTOS[k].split(',')[1] };
+    const d = { curso: B.curso, alumno: yo.nombre, lista: yo.lista, codigo: yo.codigo || "", clave_alumno: claveAlumno(), tipo: 'foto', t: Date.now(), actividad: act.nombre, consigna: k + 1, imagen: FOTOS[k].split(',')[1] };
     est.fotos[k] = 'subiendo'; guardar(clave, est); pintarFoto(k, est);
     return fetch(CFG.URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(d) })
       .then((r) => r.text()).then((t) => { if (!/^ok/.test(t)) throw new Error(t); est.fotos[k] = 'subida'; delete FOTOS[k]; guardar(clave, est); pintarFoto(k, est); })
