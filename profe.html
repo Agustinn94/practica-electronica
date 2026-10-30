@@ -41,6 +41,7 @@
 #examen .it{border-top:1px solid var(--borde);padding:12px 0}
 #examen .q{font-size:17px;line-height:1.5}
 .ex-f{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media (max-width:700px){.ex-f{grid-template-columns:1fr}}
+.al{position:relative}.al{padding-bottom:30px}.al .borrar{position:absolute;bottom:4px;right:6px;z-index:3;border:0;background:transparent;cursor:pointer;font-size:16px;opacity:.5;padding:2px}.al .borrar:hover{opacity:1}
 </style>
 </head>
 <body>
@@ -116,11 +117,12 @@ function pintar(d){
     if(e==='trabajando')nT++; if(e==='afuera')nA++; if(e==='entregó')nE++; if(e==='practicando')nS++;
     const cls=e==='entregó'?'entrego':e==='practicando'?'practicando2':e, pct=a.total?Math.round(100*(a.respondidas||0)/a.total):0;
     const chip=e==='afuera'?'<span class="chip ro">AFUERA</span>':e==='entregó'?'<span class="chip ve">entregó</span>':e==='practicando'?'<span class="chip">📘 practica</span>':sin?'<span class="chip">sin señal</span>':'<span class="chip">✍️ trabaja</span>';
-    return `<div class="al ${cls} ${sin?'sinsenal':''}" data-nom="${esc(a.alumno)}" data-lis="${esc(a.lista)}" data-act="${esc(a.actividad||'')}"><div class="est">${chip}</div><div class="n">${a.lista?esc(a.lista)+'. ':''}${esc(a.alumno)}</div>
+    return `<div class="al ${cls} ${sin?'sinsenal':''}" data-nom="${esc(a.alumno)}" data-lis="${esc(a.lista)}" data-act="${esc(a.actividad||'')}"><button class="borrar" title="Borrar esta entrega">🗑</button><div class="est">${chip}</div><div class="n">${a.lista?esc(a.lista)+'. ':''}${esc(a.alumno)}</div>
       <div class="s">${esc(a.actividad||'')}</div>
       ${e==='entregó'?`<div class="notag">${esc(a.nota)}</div>`:a.total?`<div class="barra"><div style="width:${pct}%"></div></div><div class="s">pregunta ${a.pregunta||1} de ${a.total} · respondió ${a.respondidas||0}</div>`:''}
       ${e==='practicando'?`<div class="s">${a.series||0} prácticas · ${a.bien||0} consignas bien</div>`:''}
       <div class="s">${a.salidas?`<span class="sal">🚨 salió ${a.salidas} ${a.salidas==1?'vez':'veces'}</span>${a.fuera_s?` · ${a.fuera_s} s afuera`:''} · `:''}${a.fotos?`📷 ${a.fotos} ${a.fotos==1?'foto':'fotos'} · `:''}${a.libres?`🧪 ${a.libres} simulacro${a.libres==1?'':'s'} libre${a.libres==1?'':'s'} (último: ${esc(a.nota_libre)}) · `:''}${hace(ahora-(a.ultima||ahora))}</div></div>`}).join('');
+  document.querySelectorAll('#grid .borrar').forEach(b=>b.onclick=(e)=>{e.stopPropagation();borrarAl(b.closest('.al'))});
   document.querySelectorAll('#grid .al').forEach(el=>el.onclick=()=>{$('#ex-nom').value=el.dataset.nom;$('#ex-lis').value=el.dataset.lis;const b=BANCOS[curso],a=b&&b.actividades.find(x=>x.nombre===el.dataset.act);if(a)$('#ex-act').value=a.id;verExamen()});
   $('#vacio').textContent=al.length?'':'Todavía no entró nadie. Cuando los chicos abran la página aparecen acá.';
   $('#resumen').innerHTML=`<span class="chip">✍️ trabajando: ${nT}</span><span class="chip ${nA?'ro':''}">🚨 afuera: ${nA}</span><span class="chip ve">✔ entregaron: ${nE}</span><span class="chip">📘 practicando: ${nS}</span>`;
@@ -145,6 +147,10 @@ $('#conectar').onclick=()=>{URL_=$('#url').value.trim();CLAVE=$('#clave').value;
 $('#demo').onclick=()=>{demo=true;$('#conex').textContent='modo prueba';$('#conex').className='chip amb';arrancar()};
 $('#ajustes').onclick=()=>{clearInterval(timer);$('#config').classList.remove('oculto');$('#tablero').classList.add('oculto')};
 $('#sonido').onclick=()=>{sonido=!sonido;$('#sonido').textContent=sonido?'🔔 Sonido activado':'🔔 Activar sonido';if(sonido)pitido()};
+function borrarAl(el){const lis=el.dataset.lis,act=el.dataset.act||'',nom=el.dataset.nom||'';const m=document.createElement('div');m.id='modal';
+  m.innerHTML=`<div class="caja"><h2 style="margin-top:0">¿Borrar esta entrega?</h2><p><b>N.° ${esc(lis)} · ${esc(nom)}</b>${act?'<br>'+esc(act):''}</p><p>Sale del tablero y se borra su nota de esa actividad en la planilla (queda anotado en «Eventos»). A los demás no les pasa nada.</p><div class="fila"><button class="btn sec" id="no2">Cancelar</button><button class="btn ro" id="si2">Borrar</button></div></div>`;
+  document.body.appendChild(m);$('#no2').onclick=()=>m.remove();
+  $('#si2').onclick=async()=>{m.remove();if(demo){if(sim)sim.al=sim.al.filter(a=>String(a.lista)!==String(lis));pedir();return}try{await fetch(`${URL_}?accion=borrar&curso=${curso}&lista=${encodeURIComponent(lis)}&actividad=${encodeURIComponent(act)}&clave=${encodeURIComponent(CLAVE)}`)}catch(e){}pedir()}}
 $('#limpiar').onclick=()=>{const m=document.createElement('div');m.id='modal';m.innerHTML='<div class="caja"><h2 style="margin-top:0">¿Limpiar el tablero?</h2><p>Se borra lo que se ve acá (alumnos y avisos de hoy). La planilla no se toca.</p><div class="fila"><button class="btn sec" id="no">Cancelar</button><button class="btn ro" id="si">Limpiar</button></div></div>';document.body.appendChild(m);
   $('#no').onclick=()=>m.remove();$('#si').onclick=async()=>{m.remove();if(demo){sim=null;pedir();return}try{await fetch(`${URL_}?accion=limpiar&curso=${curso}&clave=${encodeURIComponent(CLAVE)}`)}catch(e){}pedir()}};
 function alertaCampo(t){let p=$('#errurl');if(!p){p=document.createElement('div');p.id='errurl';p.className='aviso ro';$('#config').appendChild(p)}p.textContent=t}

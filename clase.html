@@ -189,6 +189,8 @@ window.__clase = function () {
       <div class="porque-d f" data-ver="1"><b>Respuesta: ${'ABCDE'[q.ok]}.</b> ${q.explic || ''}</div></div>${q.fig ? `<div class="lienzo">${q.fig}</div>` : ''}</div>`, o);
   });
   const urlAl = new URL('alumno.html?c=' + B.curso, location.href).href;
+  // las fotos se bajan todas al abrir, así la clase sigue aunque se corte internet
+  B.repaso.flatMap((r) => [r.foto, r.foto2, r.foto3]).filter(Boolean).forEach((src) => { const im = new Image(); im.src = src; });
   add(`<div class="cols"><div><div class="rotulo">Ahora</div><h1>A practicar</h1><div class="tarjetas" style="grid-template-columns:1fr">
     <div class="tj f"><span class="ic">📘</span><b>Práctica guiada o simulacro libre</b><span>Sin nota, para entrenar las cuentas.</span></div>
     <div class="tj tjn f"><span class="ic">📝</span><b>Simulacro con nota</b><span>Cuando el profe dé el código. Entran con su número de lista y su código personal.</span></div></div></div>
