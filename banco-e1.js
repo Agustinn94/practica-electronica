@@ -198,9 +198,9 @@
     temas: ['LED', 'Fotodiodo', 'Fototransistor', 'Optoacoplador', 'LDR', 'Panel solar', 'Transistor'],
     preguntas: P,
     actividades: [
-      { id: 'sim1', nombre: 'Simulacro de examen 1', codigo: 'SIMU1', minutos: 70, opc: 4, num: 6, minimo: 20, fotos: true, simulacro: true, abre: '2026-10-30T07:00:00-03:00', vence: '2026-10-30T12:40:00-03:00', tarde: '3446007388' },
-      { id: 'sim2', nombre: 'Simulacro de examen 2', codigo: 'SIMU2', minutos: 70, opc: 4, num: 6, minimo: 20, fotos: true, simulacro: true, abre: '2026-11-06T07:00:00-03:00', vence: '2026-11-06T12:40:00-03:00', tarde: '2194967439' },
-      { id: 'examen', nombre: 'Examen', codigo: 'EXAMEN', minutos: 80, opc: 4, num: 6, minimo: 30, fotos: true, simulacro: true, abre: '2026-11-20T07:00:00-03:00', vence: '2026-11-20T12:40:00-03:00', tarde: '1739748795' },
+      { id: 'sim1', nombre: 'Simulacro de examen 1', codigo: 'SIMU1', minutos: 75, opc: 6, num: 6, minimo: 25, fotos: true, simulacro: true, abre: '2026-10-30T07:00:00-03:00', vence: '2026-10-30T12:40:00-03:00', tarde: '3446007388' },
+      { id: 'sim2', nombre: 'Simulacro de examen 2', codigo: 'SIMU2', minutos: 75, opc: 6, num: 6, minimo: 25, fotos: true, simulacro: true, abre: '2026-11-06T07:00:00-03:00', vence: '2026-11-06T12:40:00-03:00', tarde: '2194967439' },
+      { id: 'examen', nombre: 'Examen', codigo: 'EXAMEN', minutos: 80, opc: 7, num: 6, minimo: 30, fotos: true, simulacro: true, abre: '2026-11-20T07:00:00-03:00', vence: '2026-11-20T12:40:00-03:00', tarde: '1739748795' },
     ],
     repaso: [
       { tema: 'LED', t: 'El LED', foto: 'fotos/leds.jpg', pie: 'LED de distintos colores y tamaños. La pata más larga es el ánodo (+).', fig: () => fig('led_serie', { VS: '', R: '', I: '', LED: 'LED' }), items: [

@@ -242,12 +242,12 @@
 
   window.BANCOS.e2 = window.BANCO = {
     curso: 'e2', nombre: 'Electrónica 2', anio: '5.° año', listas: 13,
-    temas: ['MOSFET', 'Realimentación', 'Topologías', 'Ancho de banda', 'Operacional', 'TRIAC'],
-    preguntas: P,
+    temas: ['MOSFET', 'Realimentación', 'Ancho de banda', 'Operacional', 'TRIAC'],
+    preguntas: P.filter((p) => p.tema !== 'Topologías'),
     actividades: [
-      { id: 'sim1', nombre: 'Simulacro de examen 1', codigo: 'SIMU1', minutos: 70, opc: 4, num: 6, minimo: 20, fotos: true, simulacro: true, abre: '2026-10-30T07:00:00-03:00', vence: '2026-10-30T11:10:00-03:00', tarde: '3446007388' },
-      { id: 'sim2', nombre: 'Simulacro de examen 2', codigo: 'SIMU2', minutos: 70, opc: 4, num: 6, minimo: 20, fotos: true, simulacro: true, abre: '2026-11-06T07:00:00-03:00', vence: '2026-11-06T11:10:00-03:00', tarde: '2194967439' },
-      { id: 'examen', nombre: 'Examen', codigo: 'EXAMEN', minutos: 80, opc: 4, num: 6, minimo: 30, fotos: true, simulacro: true, abre: '2026-11-17T07:00:00-03:00', vence: '2026-11-17T11:50:00-03:00', tarde: '1739748795' },
+      { id: 'sim1', nombre: 'Simulacro de examen 1', codigo: 'SIMU1', minutos: 75, opc: 6, num: 6, minimo: 25, fotos: true, simulacro: true, abre: '2026-10-30T07:00:00-03:00', vence: '2026-10-30T11:10:00-03:00', tarde: '3446007388' },
+      { id: 'sim2', nombre: 'Simulacro de examen 2', codigo: 'SIMU2', minutos: 75, opc: 6, num: 6, minimo: 25, fotos: true, simulacro: true, abre: '2026-11-06T07:00:00-03:00', vence: '2026-11-06T11:10:00-03:00', tarde: '2194967439' },
+      { id: 'examen', nombre: 'Examen', codigo: 'EXAMEN', minutos: 80, opc: 7, num: 6, minimo: 30, fotos: true, simulacro: true, abre: '2026-11-13T07:00:00-03:00', vence: '2026-11-13T11:10:00-03:00', tarde: '1739748795' },
     ],
     // ---------- repaso: todo lo que se pregunta sale de acá ----------
     repaso: [
@@ -265,11 +265,6 @@
         T`Si $\beta A \gg 1$, entonces $A_f \approx 1/\beta$: la ganancia la fijan dos resistencias y casi no cambia con el calor.`,
         'Si lo que vuelve se <b>suma</b> (realimentación positiva), el circuito oscila: es el chiflido del micrófono cerca del parlante.'],
         fx: [T`D = 1 + \beta \cdot A`, T`A_f = \dfrac{A}{D}`, T`\beta A \gg 1 \Rightarrow A_f \approx \dfrac{1}{\beta}`, T`\% = \dfrac{\text{antes} - \text{después}}{\text{antes}} \cdot 100`] },
-      { tema: 'Topologías', t: 'Las cuatro topologías', tabla: [['mide', 'vuelve', T`$R_i$`, T`$R_o$`, 'nombre en el libro'], ['tensión', 'en serie', 'sube', 'baja', 'tensión en serie (el operacional no inversor)'], ['tensión', 'en paralelo', 'baja', 'baja', 'tensión en paralelo'], ['corriente', 'en serie', 'sube', 'sube', 'corriente en serie'], ['corriente', 'en paralelo', 'baja', 'sube', 'corriente en paralelo']], items: [
-        'El nombre sale de dos preguntas: <b>qué se mide a la salida</b> (tensión o corriente) y <b>cómo vuelve a la entrada</b> (en serie o en paralelo).',
-        T`Regla corta: <b>mide tensión</b> → $R_o$ baja. <b>Mide corriente</b> → $R_o$ sube. <b>Vuelve en serie</b> → $R_i$ sube. <b>Vuelve en paralelo</b> → $R_i$ baja.`,
-        T`Lo que sube se multiplica por $D$ y lo que baja se divide por $D$.`],
-        fx: [T`R_{if} = R_i \cdot D \ \ (\text{serie})`, T`R_{of} = \dfrac{R_o}{D} \ \ (\text{mide tensión})`] },
       { tema: 'Ancho de banda', t: 'Ancho de banda', fig: () => fig('curvas'), items: [
         'El ancho de banda va de la frecuencia de corte inferior a la superior. Las frecuencias de corte se toman donde la ganancia cayó <b>3 dB</b>, al 70 % de la meseta.',
         T`Al realimentar, la curva queda <b>más baja y más ancha</b>: $f_H$ se multiplica por $D$ y $f_L$ se divide por $D$.`,
@@ -277,7 +272,7 @@
         fx: [T`f_{Hf} = f_H \cdot D`, T`f_{Lf} = \dfrac{f_L}{D}`, T`BW_f = BW \cdot D`, T`A \cdot BW = A_f \cdot BW_f`, T`BW = \dfrac{GBW}{A_f}`, T`A_{dB} = 20 \cdot \log A`] },
       { tema: 'Operacional', t: 'El operacional no inversor', foto: 'fotos/opamp.jpg', pie: 'Operacional µA741 en cápsula metálica. Adentro tiene decenas de transistores.', fig: () => fig('no_inversor', { R1: '', RF: '' }), items: [
         T`La señal entra por la pata (+). $R_f$ y $R_1$ forman la red $\beta$: un divisor que devuelve parte de la salida a la pata (−).`,
-        T`Es realimentación de <b>tensión en serie</b>: $R_i$ alta y $R_o$ baja. La ganancia la fijan solo las dos resistencias.`],
+        'La ganancia la fijan <b>solo las dos resistencias</b>: no importa qué operacional uses.'],
         fx: [T`\beta = \dfrac{R_1}{R_1 + R_f}`, T`A_f = 1 + \dfrac{R_f}{R_1} = \dfrac{1}{\beta}`] },
       { tema: 'TRIAC', t: 'El TRIAC y el dimmer', foto3: 'fotos/triac.jpg', pie3: 'Un TRIAC de verdad (BTA08, encapsulado TO-220) en la plaqueta de un equipo industrial. Las tres patas son MT1, MT2 y G.', foto2: 'fotos/diac.jpg', pie2: 'Un DIAC: parece un diodo chiquito, pero conduce en los dos sentidos cuando llega a su tensión de disparo.', foto: 'fotos/dimmer_placa.jpg', pie: 'Un dimmer armado en una plaqueta: el pote, el capacitor, el DIAC y el TRIAC, con la lámpara que regula.', fig: () => fig('dimmer'), fig2: () => fig('alfa'), items: [
         'El TRIAC es una <b>llave para corriente alterna</b>. Tiene tres patas: <b>MT1, MT2 y la puerta G</b>. Conduce en los <b>dos sentidos</b>, después de un pulso en G.',

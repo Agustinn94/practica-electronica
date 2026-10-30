@@ -12,7 +12,7 @@
 <style>
   :root { --d-fondo: #f6f8fc; --d-tinta: #13233a; --d-suave: #5a6b83; --d-az: #2563eb; --d-amb: #f59e0b; --d-ac: #2563eb }
   html, body { height: 100%; overflow: hidden; background: var(--d-fondo); color: var(--d-tinta) }
-  body.deck { display: flex; flex-direction: column; font-size: clamp(16px, min(3.4vh, 2.25vw), 46px) }
+  body.deck { display: flex; flex-direction: column; font-size: clamp(17px, min(3.7vh, 2.45vw), 50px) }
   .d-cab { display: flex; align-items: center; gap: .6em; padding: .45em 1.2em; background: #fff; border-bottom: 1px solid #e3e9f2; font-size: .55em; flex: 0 0 auto }
   .d-cab img { width: 2.4em; height: 2.4em; border-radius: 50% }
   .d-cab .d-tit { font-weight: 900; white-space: nowrap }
@@ -76,6 +76,15 @@
   .chips-d { display: flex; flex-wrap: wrap; gap: .45em; justify-content: center; max-width: 30em }
   .chips-d span { background: #fff; border: 1px solid #dbe3ee; border-radius: 999px; padding: .25em .8em; font-weight: 800; font-size: .7em }
   .grande-n { font-size: 5em; font-weight: 900; line-height: 1; color: var(--d-ac); opacity: .16 }
+  .escena { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6em; min-height: 0 }
+  .escena .esc-vis { width: min(100%, 34em); flex: 1 1 auto; min-height: 0 }
+  .escena .esc-vis svg.figura { max-height: 44vh }
+  .escena .foto img { max-height: 44vh }
+  .subs { position: relative; width: min(100%, 36em); min-height: 3.6em }
+  .subs .sub { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, .9); color: #fff; border-radius: .6em; padding: .45em .9em; font-size: 1.08em; line-height: 1.35; text-align: center; box-shadow: 0 .5em 1.4em rgba(15, 23, 42, .25) }
+  .subs .sub b { color: #fbbf24 }
+  .subs .sub.pasado { opacity: 0; transform: translateY(-.4em) }
+  @media (max-aspect-ratio: 4/5) { .subs { min-height: 0 } .subs .sub { position: static; margin-top: 8px } .subs .sub.pasado { opacity: 1; transform: none } }
   .f { opacity: 0; transform: translateY(.6em); transition: opacity .45s ease, transform .45s ease }
   .f.si { opacity: 1; transform: none }
   .d-pie { flex: 0 0 auto; display: flex; align-items: center; gap: .6em; padding: .35em 1.2em; font-size: .55em; background: #fff; border-top: 1px solid #e3e9f2 }
@@ -164,11 +173,10 @@ window.__clase = function () {
     // en pantalla va solo la idea principal de cada punto (el texto completo está en el repaso para leer)
     const corto = (t) => { const p = t.split(/(?<=[.:])\s+(?=[A-ZÁÉÍÓÚ¿<])/); let o = p[0]; if (o.replace(/<[^>]+>|\$[^$]*\$/g, 'x').length < 45 && p[1]) o += ' ' + p[1]; return o; };
     const items = s.items.map(corto);
-    const grupos = []; for (let i = 0; i < items.length; i += 3) grupos.push(items.slice(i, i + 3));
-    const der = s.fig ? `<div class="lienzo">${s.fig()}</div>` : s.tabla ? `<div class="lienzo">${tabla(s.tabla)}</div>` : '';
-    grupos.forEach((g, gi) => add(`${cab('Ideas clave')}<h2><span class="num">${n + 1}</span>${esc(s.t)}${grupos.length > 1 ? ` <span style="color:var(--d-suave);font-size:.6em">(${gi + 1}/${grupos.length})</span>` : ''}</h2>
-      <div class="cols${der ? '' : ' ancha'}"><ul class="ideas">${g.map((i) => `<li class="f">${i}</li>`).join('')}</ul>${der}</div>`, o));
-    if (s.tabla && s.fig) add(`${cab('Cuadro')}<h2><span class="num">${n + 1}</span>${esc(s.t)}</h2><div class="cols ancha"><div class="lienzo f">${tabla(s.tabla)}</div></div>`, o);
+    // escena: un dibujo o una foto grande, y la explicación aparece abajo como subtítulos, de a una
+    const vis = s.fig ? `<div class="lienzo esc-vis">${s.fig()}</div>` : fotos.length ? foto(fotos[0][0], fotos[0][1]) : '';
+    add(`${cab('Cómo funciona')}<h2><span class="num">${n + 1}</span>${esc(s.t)}</h2><div class="escena">${vis}<div class="subs">${items.map((t) => `<div class="sub f">${t}</div>`).join('')}</div></div>`, o);
+    if (false && s.tabla && s.fig) add(`${cab('Cuadro')}<h2><span class="num">${n + 1}</span>${esc(s.t)}</h2><div class="cols ancha"><div class="lienzo f">${tabla(s.tabla)}</div></div>`, o);
     if (s.fx && s.fx.length) add(`${cab('Fórmulas')}<h2><span class="num">${n + 1}</span>Fórmulas: ${esc(s.t)}</h2>
       <div class="cols ancha"><div class="formulas-d" style="justify-content:center">${s.fx.map((x) => `<span class="fx f">$${x}$</span>`).join('')}</div></div>`, o);
     if (window.SIM && SIM.tiene(s.tema)) add(`${cab('Probalo')}<h2><span class="num">${n + 1}</span>Probalo: ${esc(s.t)}</h2><div class="sim-d" id="sim-d"></div>`, Object.assign({ sim: s.tema }, o));
@@ -204,6 +212,7 @@ window.__clase = function () {
   }
   function pintarFrags() {
     frags().forEach((el, i) => el.classList.toggle('si', i < f));
+    document.querySelectorAll('#esc .subs .sub').forEach((el) => { const sig = el.nextElementSibling; el.classList.toggle('pasado', !!(sig && sig.classList.contains('si'))); });
     const pd = $('#esc .op-d'); if (pd) pd.classList.toggle('ver', !!$('#esc .porque-d.si'));
   }
   function mostrar(atras) {
